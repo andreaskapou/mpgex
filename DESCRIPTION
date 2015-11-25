@@ -1,0 +1,15 @@
+Package: mpgex
+Type: Package
+Title: Methylation Profiles predict Gene Expression
+Version: 0.0.0.9000
+Date: 2015-11-24
+Authors@R: person("C. A.", "Kapourani", email = "c.a.kapourani@sms.ed.ac.uk",
+                  role = c("aut", "cre"))
+Description: mpgex packages creates promoter methylation profiles from RRBS data and uses them as features for predicting the corresponding gene expression levels.
+License: GPL-3
+Depends: R (>= 3.0.1)
+LazyData: TRUE
+Suggests: 
+    testthat
+RoxygenNote: 5.0.1
+Imports: assertthat
