@@ -13,8 +13,8 @@
 #' @param w A vector of parameters (i.e. coefficients of the basis functions)
 #' @param H The \code{L x M} matrix design matrix, where L is the number
 #'  of observations and M the number of basis functions.
-#' @param data An \code{L x 2} matrix containing in the 1st column the number of
-#'  total reads and and in the 2nd the number of methylated reads. Each row
+#' @param data An \code{L x 2} matrix containing in the 1st column the total
+#'  number of trials and in the 2nd the number of successes. Each row
 #'  corresponds to each row of the design matrix.
 #'
 #' @return the log likelihood
@@ -33,7 +33,7 @@
 #' @export
 bpr_likelihood <- function(w, H, data){
   total <- data[ ,1]
-  meth  <- data[ ,2]
+  succ  <- data[ ,2]
 
   # Predictions of the target variables
   g <- as.vector(H %*% w)
@@ -41,7 +41,7 @@ bpr_likelihood <- function(w, H, data){
   Phi <- as.vector(pnorm(g))
 
   # Compute the log likelihood
-  res <- sum(dbinom(x = meth, size = total, prob = Phi, log = TRUE))
+  res <- sum(dbinom(x = succ, size = total, prob = Phi, log = TRUE))
   return(res)
 }
 
@@ -75,7 +75,7 @@ bpr_likelihood <- function(w, H, data){
 #' @export
 bpr_derivative <- function(w, H, data){
   total <- data[ ,1]
-  meth  <- data[ ,2]
+  succ  <- data[ ,2]
 
   # Predictions of the target variables
   g <- as.vector(H %*% w)
@@ -85,7 +85,7 @@ bpr_derivative <- function(w, H, data){
   N <- as.vector(dnorm(g))
 
   # Compute the derivative vector w.r.t the coefficients w
-  der <- (t(meth) %*% diag(1 / Phi) - t(total - meth) %*%
+  der <- (t(succ) %*% diag(1 / Phi) - t(total - succ) %*%
             diag(1 / (1 - Phi))) %*% diag(N) %*% H
 
   return(der)

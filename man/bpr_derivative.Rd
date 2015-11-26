@@ -12,8 +12,8 @@ bpr_derivative(w, H, data)
 \item{H}{The \code{L x M} matrix design matrix, where L is the number
 of observations and M the number of basis functions.}
 
-\item{data}{An \code{L x 2} matrix containing in the 1st column the number of
-total reads and and in the 2nd the number of methylated reads. Each row
+\item{data}{An \code{L x 2} matrix containing in the 1st column the total
+number of trials and in the 2nd the number of successes. Each row
 corresponds to each row of the design matrix.}
 }
 \value{

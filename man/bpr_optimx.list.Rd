@@ -2,12 +2,42 @@
 % Please edit documentation in R/bpr_optimx.R
 \name{bpr_optimx.list}
 \alias{bpr_optimx.list}
-\title{Optimization method for the BPR log likelihood function using a list X}
+\title{Optimization method for the BPR log likelihood function using a list x}
 \usage{
-\method{bpr_optimx}{list}(X, w = NULL, basis = NULL, method = "CG",
-  itnmax = 200)
+\method{bpr_optimx}{list}(x, w = NULL, basis = NULL, method = "CG",
+  itnmax = 200, ...)
+}
+\arguments{
+\item{x}{A list of elements of length N, where each element is an L x 3
+matrix of observations, where 1st column contains the locations. The 2nd
+and 3rd columns contain the total trials and number of successes at the
+corresponding locations, repsectively.}
+
+\item{w}{A vector of parameters (i.e. coefficients of the basis functions)}
+
+\item{basis}{A 'basis' object. See \code{\link{polynomial.object}}}
+
+\item{method}{The optimization method to be used. See \code{\link[optimx]{optimx}}
+for possible methods. Default is 'CG'.}
+
+\item{itnmax}{Optional argument giving the maximum number of iterations for
+the corresponding method. See \code{\link[optimx]{optimx}} for details.}
+
+\item{...}{Additional parameters}
+}
+\value{
+An N x M matrix, with the optimized parameter values. Each row of
+ the matrix corresponds to each element of the list x. The columns are of
+ the same length as the parameter vector w (i.e. number of basis functions).
 }
 \description{
-Optimization method for the BPR log likelihood function using a list X
+\code{bpr_optimx.list} computes the maximum log likelihood of the BPR
+function. Since it cannot be evaluated analytically, an optimization
+procedure is used. The \code{\link[optimx]{optimx}} packages is used for
+performing optimization. This method calls \code{\link{bpr_optimx.matrix}}
+to process each element of the list.
+}
+\seealso{
+\code{\link{bpr_optimx}}, \code{\link{bpr_optimx.matrix}}
 }
 

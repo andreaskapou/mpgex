@@ -31,7 +31,7 @@ design_matrix.default <- function(x, ...){
 #' \code{design_matrix.polynomial} creates a design matrix H using polynomial
 #' basis functions of degree M.
 #'
-#' @param x A 'basis' object. At present this can be only polynomial object.
+#' @param x A 'basis' object.
 #' @param obs A vector of observations.
 #' @param ... Additional parameters
 #'

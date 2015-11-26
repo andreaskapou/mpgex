@@ -7,7 +7,7 @@
 \method{design_matrix}{polynomial}(x, obs, ...)
 }
 \arguments{
-\item{x}{A 'basis' object. At present this can be only polynomial object.}
+\item{x}{A 'basis' object.}
 
 \item{obs}{A vector of observations.}
 
