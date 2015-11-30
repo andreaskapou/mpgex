@@ -16,6 +16,8 @@
 #' @param data An \code{L x 2} matrix containing in the 1st column the total
 #'  number of trials and in the 2nd the number of successes. Each row
 #'  corresponds to each row of the design matrix.
+#' @param is_NLL Logical, indicating if the Negative Log Likelihood should be
+#'  returned.
 #'
 #' @return the log likelihood
 #'
@@ -31,7 +33,7 @@
 #' lik <- bpr_likelihood(w, H, data)
 #'
 #' @export
-bpr_likelihood <- function(w, H, data){
+bpr_likelihood <- function(w, H, data, is_NLL = FALSE){
   total <- data[ ,1]
   succ  <- data[ ,2]
 
@@ -42,6 +44,10 @@ bpr_likelihood <- function(w, H, data){
 
   # Compute the log likelihood
   res <- sum(dbinom(x = succ, size = total, prob = Phi, log = TRUE))
+  # If we required the Negative Log Likelihood
+  if (is_NLL){
+    res <- (-1) * res
+  }
   return(res)
 }
 
@@ -73,7 +79,7 @@ bpr_likelihood <- function(w, H, data){
 #' der <- bpr_derivative(w, H, data)
 #'
 #' @export
-bpr_derivative <- function(w, H, data){
+bpr_derivative <- function(w, H, data, is_NLL = FALSE){
   total <- data[ ,1]
   succ  <- data[ ,2]
 
@@ -85,8 +91,16 @@ bpr_derivative <- function(w, H, data){
   N <- as.vector(dnorm(g))
 
   # Compute the derivative vector w.r.t the coefficients w
-  der <- (t(succ) %*% diag(1 / Phi) - t(total - succ) %*%
-            diag(1 / (1 - Phi))) %*% diag(N) %*% H
+  if (NROW(H) == 1){
+    der <- (succ * (1 / Phi) - (total - succ) * (1 / (1 - Phi))) * N %*% H
+  }else{
+    der <- (t(succ) %*% diag(1 / Phi) - t(total - succ) %*%
+              diag(1 / (1 - Phi))) %*% diag(N) %*% H
+  }
 
+  # If we required the Negative Log Likelihood
+  if (is_NLL){
+    der <- (-1) * der
+  }
   return(der)
 }

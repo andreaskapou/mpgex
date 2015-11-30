@@ -4,7 +4,7 @@
 \alias{bpr_derivative}
 \title{Derivative of the BPR log likelihood function}
 \usage{
-bpr_derivative(w, H, data)
+bpr_derivative(w, H, data, is_NLL = FALSE)
 }
 \arguments{
 \item{w}{A vector of parameters (i.e. coefficients of the basis functions)}
@@ -15,6 +15,9 @@ of observations and M the number of basis functions.}
 \item{data}{An \code{L x 2} matrix containing in the 1st column the total
 number of trials and in the 2nd the number of successes. Each row
 corresponds to each row of the design matrix.}
+
+\item{is_NLL}{Logical, indicating if the Negative Log Likelihood should be
+returned.}
 }
 \value{
 the derivative vector of the log likelihood w.r.t the vector of
