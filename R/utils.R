@@ -53,10 +53,11 @@ minmax_scaling <- function(data, xmin = NULL, xmax = NULL, fmin = 0, fmax = 1){
 partition_data <- function(X, Y, train_perc = 0.7){
   pivot <- NROW(X) * train_perc
   shuffle <- sample(NROW(X))
-  if (is.matrix(X))
+  if (is.matrix(X)){
     X <- X[shuffle, ]
-  else
+  }else{
     X <- X[shuffle]
+  }
   Y <- Y[shuffle]
 
   if (is.matrix(X)){
