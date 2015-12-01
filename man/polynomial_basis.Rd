@@ -4,7 +4,7 @@
 \alias{polynomial_basis}
 \title{Apply polynomial basis function.}
 \usage{
-polynomial_basis(X, M)
+polynomial_basis(X, M = 1)
 }
 \arguments{
 \item{X}{The input data, either a scalar, vector or matrix.}
@@ -19,9 +19,9 @@ Input X, after being transformed from the polynomial basis function.
 Applies the polynomial basis function of degree M to the input X.
 }
 \examples{
-data <- polynomial_basis(X=3, M=2)
+out <- polynomial_basis(X=3, M=2)
 # Or using a vector X
-data <- polynomial_basis(X=c(2,3,4), M=2)
+out <- polynomial_basis(X=c(2,3,4), M=2)
 
 }
 

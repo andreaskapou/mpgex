@@ -25,3 +25,18 @@ test_that("design matrix works fine", {
   class(wr_basis) <- "basis_x"
   expect_error(design_matrix(wr_basis))
 })
+
+test_that("radial basis object works fine", {
+  expect_error(rbf.object(1.5))
+  expect_error(rbf.object(-1))
+  expect_is(rbf.object(2), "rbf")
+})
+
+test_that("rbf function works fine", {
+  expect_identical(rbf_basis(1,1,1), 1)
+  expect_gt(rbf_basis(1,2,1), 0.366)
+  expect_gt(rbf_basis(1,5,1), 1.1e-07)
+  expect_gt(rbf_basis(1,5,.1), 0.2)
+  expect_gt(rbf_basis(c(2,2), c(2,1), 1), 0.366)
+  expect_gt(rbf_basis(c(2,3), c(4,4), 1), 0.0067)
+})
