@@ -44,6 +44,7 @@ bpr_likelihood <- function(w, H, data, is_NLL = FALSE){
 
   # Compute the log likelihood
   res <- sum(dbinom(x = succ, size = total, prob = Phi, log = TRUE))
+
   # If we required the Negative Log Likelihood
   if (is_NLL){
     res <- (-1) * res

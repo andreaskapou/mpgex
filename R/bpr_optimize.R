@@ -57,19 +57,22 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 10
   basis <- out$basis
 
   # Data frame for storing all the coefficients for each element of list x
-  W <- matrix(NA_real_, nrow = N, ncol = length(w))
-  colnames(W) <- paste("w", seq(1,length(w)), sep = "")
+  W_opt <- matrix(NA_real_, nrow = N, ncol = length(w))
+  colnames(W_opt) <- paste("w", seq(1,length(w)), sep = "")
+  des_mat <- list()
 
   # Perform optimization for each element of list x,
   # i.e. for each promoter region i.
   for (i in 1:N){
-    W[i, ] <- bpr_optim.matrix(x = x[[i]],
-                               w = w,
-                               basis = basis,
-                               method = method,
-                               itnmax = itnmax)
+    out_opt <- bpr_optim.matrix(x = x[[i]],
+                                w = w,
+                                basis = basis,
+                                method = method,
+                                itnmax = itnmax)
+    W_opt[i, ] <- out_opt$w_opt
+    des_mat[[i]] <- out_opt$des_mat
   }
-  return(W)
+  return(list(W_opt = W_opt, des_mat = des_mat))
 }
 
 #' Optimization method for the BPR NLL using matrix x
@@ -113,7 +116,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 
   H <- des_mat$H
 
   # Call optim function to perform minimization of the NLL of BPR function
-  opt_w <- optim(par     = w,
+  w_opt <- optim(par     = w,
                  fn      = bpr_likelihood,
                  gr      = bpr_derivative,
                  method  = method,
@@ -122,7 +125,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 
                  data    = data,
                  is_NLL  = TRUE)$par
 
-  return(as.matrix(opt_w))
+  return(list(w_opt = as.matrix(w_opt), des_mat = des_mat))
 }
 
 

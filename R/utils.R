@@ -74,3 +74,38 @@ partition_data <- function(X, Y, train_perc = 0.7){
 
   return(list(train = train, test = test))
 }
+
+
+
+#'
+#' Polynomial function of degree M.
+#' X is the input vector and w are the coefficients of the
+#' polynomial whose length is M + 1
+#'
+#'@export
+eval_prob_polyn_func = function(x, w){
+  f <- rep(0, length(x))
+  M <- length(w)
+  for (i in 1:M){
+    f <- f + w[i] * polynomial_basis(x, i - 1)
+  }
+  Phi <- pnorm(f)
+  return(Phi)
+}
+
+
+#'
+#' Radia basis function of degree M.
+#' X is the observation
+#'
+#'@export
+eval_prob_rbf_func = function(x, w, basis, mus){
+  f <- rep(w[1], NROW(x))
+  M <- length(mus)
+  x <- as.matrix(x)
+  for (i in 1:M){
+    f <- f + w[i + 1] * apply(x, 1, rbf_basis, mus = mus[i], gamma = basis$gamma)
+  }
+  Phi <- pnorm(f)
+  return(Phi)
+}

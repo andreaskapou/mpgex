@@ -92,7 +92,7 @@ design_matrix.rbf <- function(x, obs, ...){
   M   <- x$M          # Number of coefficients
   # In case the number of basis functions is higher than the total observations
   # set the number of basis functions equal to the observations.
-  # TODO: Check that this holds!
+  # TODO: Check that this holds! CHANGE CODE HERE
   if (M > N){
     M <- N
   }
@@ -104,7 +104,7 @@ design_matrix.rbf <- function(x, obs, ...){
     gamma <- x$gamma  # Inverse width of basis function
 
     repeat {
-      km <- stats::kmeans(obs, M, nstart = 10)  # Use K-means
+      km <- stats::kmeans(obs, M, iter.max = 30, nstart = 10)  # Use K-means
       if (min(km$size) > 0)  # Only accept non-empty clusters
         break
     }
