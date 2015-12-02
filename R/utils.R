@@ -109,3 +109,32 @@ eval_prob_rbf_func = function(x, w, basis, mus){
   Phi <- pnorm(f)
   return(Phi)
 }
+
+#'
+#' Plot function for polynomial
+#'
+#' @export
+plot.polynomial <- function(basis, dataset, w){
+  xmin <- min(dataset[,1]) - 0.05
+  xmax <- max(dataset[,1]) + 0.05
+  xs <- seq(xmin, xmax, len = 500)
+  plot(dataset[,1], dataset[,3] / dataset[,2],
+       col = "darkgreen", pch = 24, xlim = c(xmin, xmax), ylim = c(0,1),
+       xlab = "region x", ylab = "methylation level")
+  lines(x = xs, y=eval_prob_polyn_func(xs, w=w), col=2, lwd=2)
+}
+
+
+#'
+#' Plot function for rbf
+#'
+#' @export
+plot.rbf <- function(basis, dataset, w, mus){
+  xmin <- min(dataset[,1]) - 0.05
+  xmax <- max(dataset[,1]) + 0.05
+  xs <- seq(xmin, xmax, len = 500)
+  plot(dataset[,1], dataset[,3] / dataset[,2],
+       col = "darkgreen", pch = 24, xlim = c(xmin, xmax), ylim = c(0,1),
+       xlab = "region x", ylab = "methylation level")
+  lines(x=xs, y=eval_prob_rbf_func(xs, w = w, basis = basis, mus = mus), col=2, lwd=2)
+}
