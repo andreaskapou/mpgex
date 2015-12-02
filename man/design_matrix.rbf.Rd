@@ -23,7 +23,7 @@ number of radial basis functions.
 basis functions of degree M.
 }
 \examples{
-obj <- polynomial.object(M=2)
+obj <- rbf.object(M=2)
 obs <- c(0,.2,.5)
 H <- design_matrix(obj, obs)
 
