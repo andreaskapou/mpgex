@@ -4,12 +4,15 @@
 \alias{rbf.object}
 \title{Creates an RBF object}
 \usage{
-rbf.object(M = 2, gamma = 1)
+rbf.object(M = 2, gamma = 1, eq_spaced_mus = FALSE)
 }
 \arguments{
 \item{M}{The degree of the RBF object that will be created.}
 
 \item{gamma}{Inverse width of radial basis function.}
+
+\item{eq_spaced_mus}{Logical, if TRUE, equally spaced centers are created,
+otherwise centers are created using \code{\link[stats]{kmeans}} algorithm}
 }
 \value{
 An object of type 'RBF'.

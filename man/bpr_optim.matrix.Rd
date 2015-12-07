@@ -25,8 +25,14 @@ the corresponding method. See \code{\link[stats]{optim}} for details.}
 \item{...}{Additional parameters}
 }
 \value{
-Optimized values for the parameter/coefficient vector w. The length
- of the result is the same as the length of the vector w.
+A list containing the following elements:
+\itemize{
+ \item{ \code{w_opt}: Optimized values for the coefficient vector w.
+   The length of the result is the same as the length of the vector w.
+ }
+ \item{ \code{des_mat}: The desing matrix used in optimization procedure.
+ }
+}
 }
 \description{
 \code{bpr_optim.matrix} minimizes the negative log likelihood of the BPR
@@ -38,7 +44,7 @@ performing optimization.
 basis <- polynomial.object(M=2)
 w <- c(0.1, 0.1, 0.1)
 data <- bpr_data[[1]]
-w_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG")
+out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG")
 
 }
 \seealso{

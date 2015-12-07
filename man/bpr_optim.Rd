@@ -18,7 +18,7 @@ a \code{\link{list}} or a \code{\link{matrix}}.
 }
 \examples{
 data <- bpr_data
-W_opt <- bpr_optim(x = data, method = "BFGS")
+out_opt <- bpr_optim(x = data, method = "BFGS")
 
 }
 \seealso{

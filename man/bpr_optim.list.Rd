@@ -29,6 +29,20 @@ the corresponding method. See \code{\link[stats]{optim}} for details.}
 An N x M matrix, with the optimized parameter values. Each row of
  the matrix corresponds to each element of the list x. The columns are of
  the same length as the parameter vector w (i.e. number of basis functions).
+
+A list containing the following elements:
+\itemize{
+ \item{ \code{W_opt}: An N x M matrix with the optimized parameter values.
+   Each row of the matrix corresponds to each element of the list x. The
+   columns are of the same length as the parameter vector w (i.e. number
+   of basis functions).
+ }
+ \item{ \code{des_mat}: A list containing the corresponding desing matrices
+   for each element of the list x
+ }
+ \item{ \code{basis}: The basis object.
+ }
+}
 }
 \description{
 \code{bpr_optim.list} minimizes the negative log likelihood of the BPR
@@ -39,7 +53,7 @@ to process each element of the list.
 }
 \examples{
 data <- bpr_data
-W_opt <- bpr_optim(x = data, method = "CG")
+out_opt <- bpr_optim(x = data, method = "CG")
 
 }
 \seealso{

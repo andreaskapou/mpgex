@@ -86,30 +86,32 @@ design_matrix.rbf <- function(x, obs, ...){
   assertthat::assert_that(is(x, "rbf"))
   assertthat::assert_that(is.vector(obs))
 
-  ## TODO Compute the centers using K-means!!!
+  ### TODO Evaluate equally spaced mus as an option???
+
   mus <- NULL
   N   <- length(obs)  # Length of the dataset
   M   <- x$M          # Number of coefficients
-  # In case the number of basis functions is higher than the total observations
-  # set the number of basis functions equal to the observations.
-  # TODO: Check that this holds! CHANGE CODE HERE
-  if (M > N){
-    M <- N
+  # If number of basis functions is higher than the total observations
+  if (M > N - 1){
+    stop("Number of basis functions is higher than number of observations!")
   }
   if (M == 0){
     H <- matrix(1, nrow = N, ncol = M + 1)
   }else{
+    if (x$eq_spaced_mus){
+      mus <- seq(min(obs), max(obs), length.out = M)
+    }else{
+      repeat {
+        km <- stats::kmeans(obs, M, iter.max = 30, nstart = 10)  # Use K-means
+        if (min(km$size) > 0)  # Only accept non-empty clusters
+          break
+      }
+      mus <- km$centers  # RBF centers
+    }
+
     # Convert the 'obs' vector to an N x 1 dimensional matrix
     obs <- as.matrix(obs)
     gamma <- x$gamma  # Inverse width of basis function
-
-    repeat {
-      km <- stats::kmeans(obs, M, iter.max = 30, nstart = 10)  # Use K-means
-      if (min(km$size) > 0)  # Only accept non-empty clusters
-        break
-    }
-    mus <- km$centers  # RBF centers
-
     H <- matrix(1, nrow = N, ncol = M)
     for (j in 1:M){
       # TODO: Implement the multivariate case!

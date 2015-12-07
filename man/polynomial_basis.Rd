@@ -24,4 +24,7 @@ out <- polynomial_basis(X=3, M=2)
 out <- polynomial_basis(X=c(2,3,4), M=2)
 
 }
+\seealso{
+\code{\link{rbf_basis}}
+}
 

@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' data <- bpr_data
-#' W_opt <- bpr_optim(x = data, method = "BFGS")
+#' out_opt <- bpr_optim(x = data, method = "BFGS")
 #'
 #' @export
 bpr_optim <- function(x, ...){
@@ -41,11 +41,25 @@ bpr_optim.default <- function(x, ...){
 #'  the matrix corresponds to each element of the list x. The columns are of
 #'  the same length as the parameter vector w (i.e. number of basis functions).
 #'
+#' @return A list containing the following elements:
+#' \itemize{
+#'  \item{ \code{W_opt}: An N x M matrix with the optimized parameter values.
+#'    Each row of the matrix corresponds to each element of the list x. The
+#'    columns are of the same length as the parameter vector w (i.e. number
+#'    of basis functions).
+#'  }
+#'  \item{ \code{des_mat}: A list containing the corresponding desing matrices
+#'    for each element of the list x
+#'  }
+#'  \item{ \code{basis}: The basis object.
+#'  }
+#' }
+#'
 #' @seealso \code{\link{bpr_optim}}, \code{\link{bpr_optim.matrix}}
 #'
 #' @examples
 #' data <- bpr_data
-#' W_opt <- bpr_optim(x = data, method = "CG")
+#' out_opt <- bpr_optim(x = data, method = "CG")
 #'
 #' @export
 bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 100, ...){
@@ -72,7 +86,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 10
     W_opt[i, ] <- out_opt$w_opt
     des_mat[[i]] <- out_opt$des_mat
   }
-  return(list(W_opt = W_opt, des_mat = des_mat))
+  return(list(W_opt = W_opt, des_mat = des_mat, basis = basis))
 }
 
 #' Optimization method for the BPR NLL using matrix x
@@ -93,8 +107,14 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 10
 #'  the corresponding method. See \code{\link[stats]{optim}} for details.
 #' @param ... Additional parameters
 #'
-#' @return Optimized values for the parameter/coefficient vector w. The length
-#'  of the result is the same as the length of the vector w.
+#' @return A list containing the following elements:
+#' \itemize{
+#'  \item{ \code{w_opt}: Optimized values for the coefficient vector w.
+#'    The length of the result is the same as the length of the vector w.
+#'  }
+#'  \item{ \code{des_mat}: The desing matrix used in optimization procedure.
+#'  }
+#' }
 #'
 #' @seealso \code{\link{bpr_optim}}, \code{\link{bpr_optim.list}}
 #'
@@ -102,7 +122,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 10
 #' basis <- polynomial.object(M=2)
 #' w <- c(0.1, 0.1, 0.1)
 #' data <- bpr_data[[1]]
-#' w_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG")
+#' out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG")
 #'
 #' @importFrom stats optim
 #'

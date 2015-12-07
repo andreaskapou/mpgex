@@ -25,4 +25,7 @@ out <- rbf_basis(X = c(1,2), mus = c(1,1))
 out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 0.1)
 
 }
+\seealso{
+\code{\link{polynomial_basis}}
+}
 
