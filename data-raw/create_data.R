@@ -4,7 +4,7 @@ create_bpr_data <- function(N = 300, pi.c = c(0.45, 0.35, 0.2), max_L = 25,
   # Create a list to store data for each methylation region
   X       <- list()
   # A vector for storing corresponding gene expression data
-  Y       <- vector(mode="numeric", length=N)
+  Y       <- vector(mode = "numeric", length = N)
 
   # For each of the N objects
   for (i in 1:N){
@@ -84,6 +84,7 @@ create_bpr_data <- function(N = 300, pi.c = c(0.45, 0.35, 0.2), max_L = 25,
   return(list(X = X, Y = Y))
 }
 
+set.seed(1)
 bpr <- create_bpr_data(N=600)
 bpr_data <- bpr$X
 gex_data <- bpr$Y

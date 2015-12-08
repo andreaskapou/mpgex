@@ -113,9 +113,7 @@ rbf_basis <- function(X, mus, gamma = 1){
 #' Method for evaluating the probit transformation of the polynomial function
 #' of degree M for observation data x and coefficients w.
 #'
-#' @param x Input / observation data.
-#' @param w Vector of length M, containing the coefficients of an Mth-order
-#'  basis function.
+#' @inheritParams eval_polyn_func
 #'
 #' @return The probit transformed polynomial function values.
 #'
@@ -128,11 +126,8 @@ rbf_basis <- function(X, mus, gamma = 1){
 eval_prob_polyn_func <- function(x, w){
   assertthat::assert_that(is.vector(x))
   assertthat::assert_that(is.vector(w))
-  f <- rep(0, length(x))
-  M <- length(w)
-  for (i in 1:M){
-    f <- f + w[i] * polynomial_basis(x, i - 1)
-  }
+
+  f <- eval_polyn_func(x, w)
   Phi <- pnorm(f)
   return(Phi)
 }
@@ -143,7 +138,7 @@ eval_prob_polyn_func <- function(x, w){
 #' Method for evaluating the probit transformation of the rbf function
 #' with M basis for observation data x and coefficients w.
 #'
-#' @inheritParams eval_prob_polyn_func
+#' @inheritParams eval_polyn_func
 #' @param basis The basis object.
 #' @param mus The centers of the rbf function.
 #'
@@ -159,6 +154,63 @@ eval_prob_polyn_func <- function(x, w){
 #' @export
 eval_prob_rbf_func <- function(x, w, basis, mus){
   assertthat::assert_that(is.vector(w))
+
+  f <- eval_rbf_func(x, w, basis, mus)
+  Phi <- pnorm(f)
+  return(Phi)
+}
+
+
+#--------------------------------------------------------
+
+
+#' Evaluate polynomial function
+#'
+#' Method for evaluating the the polynomial function of degree M for
+#' observation data x and coefficients w.
+#'
+#' @param x Input / observation data.
+#' @param w Vector of length M, containing the coefficients of an Mth-order
+#'  basis function.
+#'
+#' @return The polynomial function values.
+#'
+#' @examples
+#' x <- c(1,2,3)
+#' w <- c(0.1, 0.3, -0.6)
+#' out <- eval_polyn_func(x, w)
+#'
+#' @export
+eval_polyn_func <- function(x, w){
+  f <- rep(0, length(x))
+  M <- length(w)
+  for (i in 1:M){
+    f <- f + w[i] * polynomial_basis(x, i - 1)
+  }
+  return(f)
+}
+
+
+#' Evaluate rbf function
+#'
+#' Method for evaluating the rbf function with M basis for observation
+#' data x and coefficients w.
+#'
+#' @inheritParams eval_polyn_func
+#' @param basis The basis object.
+#' @param mus The centers of the rbf function.
+#'
+#' @return The rbf function values.
+#'
+#' @examples
+#' x <- c(1,2,3)
+#' w <- c(0.1, 0.3, -0.6)
+#' basis <- rbf.object(M = 2)
+#' mus <- c(2,2.5)
+#' out <- eval_rbf_func(x, w, basis, mus)
+#'
+#' @export
+eval_rbf_func <- function(x, w, basis, mus){
   f <- rep(w[1], length(x))
   M <- basis$M
   x <- as.matrix(x)
@@ -167,6 +219,5 @@ eval_prob_rbf_func <- function(x, w, basis, mus){
                               mus = mus[i],
                               gamma = basis$gamma)
   }
-  Phi <- pnorm(f)
-  return(Phi)
+  return(f)
 }

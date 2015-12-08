@@ -37,10 +37,6 @@ bpr_optim.default <- function(x, ...){
 #'  corresponding locations, repsectively.
 #' @inheritParams bpr_optim.matrix
 #'
-#' @return An N x M matrix, with the optimized parameter values. Each row of
-#'  the matrix corresponds to each element of the list x. The columns are of
-#'  the same length as the parameter vector w (i.e. number of basis functions).
-#'
 #' @return A list containing the following elements:
 #' \itemize{
 #'  \item{ \code{W_opt}: An N x M matrix with the optimized parameter values.
@@ -86,7 +82,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 10
     W_opt[i, ] <- out_opt$w_opt
     des_mat[[i]] <- out_opt$des_mat
   }
-  return(list(W_opt = W_opt, des_mat = des_mat, basis = basis))
+  return(list(W_opt = W_opt, des_mat = des_mat, basis = basis, w = w))
 }
 
 #' Optimization method for the BPR NLL using matrix x
@@ -146,6 +142,65 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 
                  is_NLL  = TRUE)$par
 
   return(list(w_opt = as.matrix(w_opt), des_mat = des_mat))
+}
+
+
+#' Optimization method for the scaled BPR NLL function using list x
+#'
+#' \code{bpr_scaled_optim} minimizes the negative log likelihood of the scaled
+#' BPR function. Since it cannot be evaluated analytically, an optimization
+#' procedure is used. The \code{\link[stats]{optim}} packages is used for
+#' performing optimization. This method calls \code{\link{bpr_optim.matrix}}
+#' to process each element of the list.
+#'
+#' @param x A list of elements of length N, where each element is an L x 3
+#'  matrix of observations, where 1st column contains the locations. The 2nd
+#'  and 3rd columns contain the total trials and number of successes at the
+#'  corresponding locations, repsectively.
+#' @param W_const An N x M matrix containing the basis coefficients of a
+#'  previously fitted profile. Each row will be used as a constant vector
+#'  which will be scaled when performing optimization on the new profiles.
+#' @inheritParams bpr_optim.matrix
+#'
+#' @return A list containing the following elements:
+#' \itemize{
+#'  \item{ \code{W_opt}: An N x M matrix with the optimized parameter values.
+#'    Each row of the matrix corresponds to each element of the list x. The
+#'    columns are of the same length as the parameter vector w (i.e. number
+#'    of basis functions).
+#'  }
+#'  \item{ \code{des_mat}: A list containing the corresponding desing matrices
+#'    for each element of the list x
+#'  }
+#'  \item{ \code{basis}: The basis object.
+#'  }
+#' }
+#'
+#' @seealso \code{\link{bpr_optim.matrix}}
+#'
+#'
+#' @export
+bpr_scaled_optim <- function(x, W_const, w = NULL, basis = NULL, method = "CG", itnmax = 100, ...){
+  N <- length(x)
+  assertthat::assert_that(N > 0)
+
+  # Data frame for storing all the coefficients for each element of list x
+  W_opt <- matrix(NA_real_, nrow = N, ncol = length(w))
+  colnames(W_opt) <- paste("w", seq(1,length(w)), sep = "")
+  des_mat <- list()
+
+  # Perform optimization for each element of list x, using the W_const
+  # parameters in order to get a scaled version of the profiles.
+  for (i in 1:N){
+    out_opt <- bpr_optim.matrix(x = x[[i]],
+                                w = (W_const[i,] + 1e-10) * w,
+                                basis = basis,
+                                method = method,
+                                itnmax = itnmax)
+    W_opt[i, ] <- out_opt$w_opt
+    des_mat[[i]] <- out_opt$des_mat
+  }
+  return(list(W_opt = W_opt, des_mat = des_mat, basis = basis))
 }
 
 
