@@ -4,7 +4,7 @@
 \alias{bpr_scaled_optim}
 \title{Optimization method for the scaled BPR NLL function using list x}
 \usage{
-bpr_scaled_optim(x, W_const, w = NULL, basis = NULL, method = "CG",
+bpr_scaled_optim(x, W_contr, w = NULL, basis = NULL, method = "CG",
   itnmax = 100, ...)
 }
 \arguments{
@@ -13,7 +13,7 @@ matrix of observations, where 1st column contains the locations. The 2nd
 and 3rd columns contain the total trials and number of successes at the
 corresponding locations, repsectively.}
 
-\item{W_const}{An N x M matrix containing the basis coefficients of a
+\item{W_contr}{An N x M matrix containing the basis coefficients of a
 previously fitted profile. Each row will be used as a constant vector
 which will be scaled when performing optimization on the new profiles.}
 

@@ -157,7 +157,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 
 #'  matrix of observations, where 1st column contains the locations. The 2nd
 #'  and 3rd columns contain the total trials and number of successes at the
 #'  corresponding locations, repsectively.
-#' @param W_const An N x M matrix containing the basis coefficients of a
+#' @param W_contr An N x M matrix containing the basis coefficients of a
 #'  previously fitted profile. Each row will be used as a constant vector
 #'  which will be scaled when performing optimization on the new profiles.
 #' @inheritParams bpr_optim.matrix
@@ -180,7 +180,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG", itnmax = 
 #'
 #'
 #' @export
-bpr_scaled_optim <- function(x, W_const, w = NULL, basis = NULL, method = "CG", itnmax = 100, ...){
+bpr_scaled_optim <- function(x, W_contr, w = NULL, basis = NULL, method = "CG", itnmax = 100, ...){
   N <- length(x)
   assertthat::assert_that(N > 0)
 
@@ -189,18 +189,18 @@ bpr_scaled_optim <- function(x, W_const, w = NULL, basis = NULL, method = "CG", 
   colnames(W_opt) <- paste("w", seq(1,length(w)), sep = "")
   des_mat <- list()
 
-  # Perform optimization for each element of list x, using the W_const
+  # Perform optimization for each element of list x, using the W_contr
   # parameters in order to get a scaled version of the profiles.
   for (i in 1:N){
     out_opt <- bpr_optim.matrix(x = x[[i]],
-                                w = (W_const[i,] + 1e-10) * w,
+                                w = (W_contr[i,] + 1e-10) * w,
                                 basis = basis,
                                 method = method,
                                 itnmax = itnmax)
     W_opt[i, ] <- out_opt$w_opt
     des_mat[[i]] <- out_opt$des_mat
   }
-  return(list(W_opt = W_opt, des_mat = des_mat, basis = basis))
+  return(list(W_opt = W_opt, des_mat = des_mat, basis = basis, w = w))
 }
 
 

@@ -1,11 +1,14 @@
-#' Wrapper function for predicting gene expression from methylation profiles
+#' Predict differntial gene expression from differential methylation
 #'
-#' \code{wrapper_mpgex} is a function that wraps all the necessary subroutines
-#' for performing predictions on gene expressions. Initially, it optimizes the
-#' parameters of the basis functions so as to learn the methylation profiles.
-#' Then uses the learned parameters / coefficients of the basis functions as
-#' input features for performing linear regression in order to predict/regress
-#' the corresponding gene expression data.
+#' \code{differential_mpgex} is a function that wraps all the necessary
+#' subroutines for performing predictions on differential gene expression.
+#' Initially, it optimizes the parameters of the basis functions so as to
+#' learn the methylation profiles for the control case. Then uses these
+#' parameters as constants and learns the methylation profiles of the treatment
+#' as a scaled version of the control profiles. The coefficients showing
+#' the difference between the two profiles is given as input features for
+#' performing linear regression in order to predict/regress
+#' the corresponding differential gene expression data.
 #'
 #' @param formula An object of class \code{\link[stats]{formula}} needed when
 #'  calling the \code{\link[stats]{lm}} function for performing linear
@@ -38,23 +41,34 @@
 #' out   <- wrapper_mpgex(X = obs, Y = Y, basis = basis)
 #'
 #' @export
-wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
+differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
                           w = NULL, train_perc = 0.7, method = "CG", itnmax = 100){
 
   # -----------------------------------
-  # Compute the optimized parameters of the BPR function for each element in x
-  out_opt <- bpr_optim(x = X,
-                       w = w,
-                       basis = basis,
-                       method = method,
-                       itnmax = itnmax)
+  # Compute the optimized parameters of the BPR function for control samples
+  out_contr_opt <- bpr_optim(x = X$control,
+                             w = w,
+                             basis = basis,
+                             method = method,
+                             itnmax = itnmax)
 
+  # -----------------------------------
+  # Compute the optimized parameters of the BPR function for treatment samples
+  out_treat_opt <- bpr_scaled_optim(x = X$treatment,
+                                    W_contr = out_contr_opt$W_opt,
+                                    w       = out_contr_opt$w,
+                                    basis   = out_contr_opt$basis,
+                                    method  = method,
+                                    itnmax  = itnmax)
+
+  X_prof <- NULL
+  X_prof <- out_treat_opt$W_opt / out_contr_opt$W_opt
+
+  diff_expr <- Y$control - Y$treatment
   # ------------------------------------
   # Create training and test sets
-  X_prof <- NULL
-  X_prof <- out_opt$W_opt
   dataset <- partition_data(X = X_prof,
-                            Y = Y,
+                            Y = diff_expr,
                             train_ind  = train_ind,
                             train_perc = train_perc)
   train   <- dataset$train
@@ -84,9 +98,11 @@ wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
 
   # Create an 'mpgex' object
   mpgex <- list(X = X,
+                control_opt   = out_contr_opt,
+                treatment_opt = out_treat_opt,
+                diff_expr     = diff_expr,
                 X_prof  = X_prof,
-                basis   = out_opt$basis,
-                des_mat = out_opt$des_mat,
+                basis   = out_treat_opt$basis,
                 method  = method,
                 itnmax  = itnmax,
                 train_data   = train,
@@ -96,7 +112,7 @@ wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
                 test_pred    = test_pred,
                 train_rmserr = train_rmserr,
                 test_rmserr  = test_rmserr)
-  class(mpgex) <- "mpgex"
+  class(mpgex) <- "diff-mpgex"
 
   return(mpgex)
 }

@@ -40,37 +40,39 @@ minmax_scaling <- function(data, xmin = NULL, xmax = NULL, fmin = 0, fmax = 1){
 #'
 #' @param X Input / Independent variables
 #' @param Y Dependent variables
+#' @param train_ind Index of traininig data, if NULL a random one is generated.
 #' @param train_perc Percentage of training data when partitioning.
 #'
-#' @return A list containing the train and test data.
+#' @return A list containing the train, test data and index of training data.
 #'
 #' @examples
-#' X <- matrix(c(-20, 0, 15, 20), ncol=2)
-#' Y <- c(2,5)
+#' X <- matrix(c(-20, 0, 15, 20, 20, 10, 4, 5), ncol=2)
+#' Y <- c(2, 5, 0, 8)
 #' data <- partition_data(X, Y)
 #'
+#' ##
+#' X <- matrix(c(-20, 0, 15, 20, 20, 10, 4, 5), ncol=2)
+#' Y <- c(2, 5, 0, 8)
+#' train_ind <- c(1,4)
+#' data <- partition_data(X, Y, train_ind)
+#'
 #' @export
-partition_data <- function(X, Y, train_perc = 0.7){
-  pivot <- NROW(X) * train_perc
-  shuffle <- sample(NROW(X))
-  if (is.matrix(X)){
-    X <- X[shuffle, ]
-  }else{
-    X <- X[shuffle]
-  }
-  Y <- Y[shuffle]
-
-  if (is.matrix(X)){
-    train <- data.frame(X = X[1:pivot, ],
-                        Y = as.matrix(Y[1:pivot]))
-    test  <- data.frame(X = X[(pivot + 1):NROW(X), ],
-                        Y = as.matrix(Y[(pivot + 1):NROW(X)]))
-  }else{
-    train <- data.frame(X = X[1:pivot],
-                        Y = as.matrix(Y[1:pivot]))
-    test  <- data.frame(X = X[(pivot + 1):NROW(X)],
-                        Y = as.matrix(Y[(pivot + 1):NROW(X)]))
+partition_data <- function(X, Y, train_ind = NULL, train_perc = 0.7){
+  if (is.null(train_ind)){
+    pivot <- NROW(X) * train_perc
+    train_ind <- sample(NROW(X), round(pivot))
   }
 
-  return(list(train = train, test = test))
+  if (is.matrix(X)){
+    train <- data.frame(X = X[train_ind, ],
+                        Y = as.matrix(Y[train_ind]))
+    test  <- data.frame(X = X[-train_ind, ],
+                        Y = as.matrix(Y[-train_ind]))
+  }else{
+    train <- data.frame(X = X[train_ind],
+                        Y = as.matrix(Y[train_ind]))
+    test  <- data.frame(X = X[-train_ind],
+                        Y = as.matrix(Y[-train_ind]))
+  }
+  return(list(train = train, test = test, train_ind = train_ind))
 }
