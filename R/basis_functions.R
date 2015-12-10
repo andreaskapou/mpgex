@@ -36,6 +36,9 @@ polynomial.object <- function(M = 1){
 #' @param gamma Inverse width of radial basis function.
 #' @param eq_spaced_mus Logical, if TRUE, equally spaced centers are created,
 #'  otherwise centers are created using \code{\link[stats]{kmeans}} algorithm
+#' @param whole_region Logical, indicating if the centers will be evaluated
+#'  equally spaced on the whole region, or between the min and max of the
+#'  observation values.
 #'
 #' @return An object of type 'RBF'.
 #'
@@ -46,11 +49,11 @@ polynomial.object <- function(M = 1){
 #' (obj)
 #'
 #' @export
-rbf.object <- function(M = 2, gamma = 1, eq_spaced_mus = FALSE){
+rbf.object <- function(M = 2, gamma = 1, eq_spaced_mus = FALSE, whole_region = FALSE){
   # Check that M is integer
   assertthat::assert_that(M %% 1 == 0)
   assertthat::assert_that(M > -1)
-  obj <- list(M = M, gamma = gamma, eq_spaced_mus = eq_spaced_mus)
+  obj <- list(M = M, gamma = gamma, eq_spaced_mus = eq_spaced_mus, whole_region = whole_region)
   class(obj) <- "rbf"
   return(obj)
 }

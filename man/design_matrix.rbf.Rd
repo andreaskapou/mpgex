@@ -14,9 +14,10 @@
 \item{...}{Additional parameters}
 }
 \value{
-The design matrix H. The dimensions of the matrix H are
-N x (M+1), where N is the length of the observations, and M is the
-number of radial basis functions.
+A list containing the design matrix \code{H} and the centers of the
+rbf function \code{mus}. The dimensions of the matrix H are N x (M+1), where
+N is the length of the observations, and M is the number of radial basis
+functions. \code{mus} is a vector of length M containg the centers of rbfs.
 }
 \description{
 \code{design_matrix.rbf} creates a design matrix H using radial
@@ -25,7 +26,7 @@ basis functions of degree M.
 \examples{
 obj <- rbf.object(M=2)
 obs <- c(0,.2,.5)
-H <- design_matrix(obj, obs)
+des_mat <- design_matrix(obj, obs)
 
 }
 \seealso{

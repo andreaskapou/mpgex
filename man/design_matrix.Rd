@@ -23,6 +23,7 @@ H <- design_matrix(obj, obs)
 
 }
 \seealso{
-\code{\link{polynomial_basis}}, \code{\link{design_matrix.polynomial}}
+\code{\link{polynomial_basis}}, \code{\link{rbf_basis}},
+ \code{\link{design_matrix.polynomial}}, \code{\link{design_matrix.rbf}}
 }
 

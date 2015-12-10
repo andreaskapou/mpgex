@@ -7,7 +7,8 @@
 #' @param x A \code{\link{polynomial.object}}
 #' @param ... Additional parameters
 #'
-#' @seealso \code{\link{polynomial_basis}}, \code{\link{design_matrix.polynomial}}
+#' @seealso \code{\link{polynomial_basis}}, \code{\link{rbf_basis}},
+#'  \code{\link{design_matrix.polynomial}}, \code{\link{design_matrix.rbf}}
 #'
 #' @examples
 #' obj <- polynomial.object(M=2)
@@ -35,9 +36,9 @@ design_matrix.default <- function(x, ...){
 #' @param obs A vector of observations.
 #' @param ... Additional parameters
 #'
-#' @return The design matrix H. The dimensions of the matrix H are
-#' N x (M+1), where N is the length of the observations, and M is the degree of
-#' the polynomial.
+#' @return A list containing the design matrix H. The dimensions of the matrix
+#' H are N x (M+1), where N is the length of the observations, and M is the
+#' degree of the polynomial.
 #'
 #' @seealso \code{\link{design_matrix}}, \code{\link{polynomial_basis}}
 #'
@@ -70,16 +71,17 @@ design_matrix.polynomial <- function(x, obs, ...){
 #' @param obs A vector of observations.
 #' @param ... Additional parameters
 #'
-#' @return The design matrix H. The dimensions of the matrix H are
-#' N x (M+1), where N is the length of the observations, and M is the
-#' number of radial basis functions.
+#' @return A list containing the design matrix \code{H} and the centers of the
+#' rbf function \code{mus}. The dimensions of the matrix H are N x (M+1), where
+#' N is the length of the observations, and M is the number of radial basis
+#' functions. \code{mus} is a vector of length M containg the centers of rbfs.
 #'
 #' @seealso \code{\link{design_matrix}}, \code{\link{rbf_basis}}
 #'
 #' @examples
 #' obj <- rbf.object(M=2)
 #' obs <- c(0,.2,.5)
-#' H <- design_matrix(obj, obs)
+#' des_mat <- design_matrix(obj, obs)
 #'
 #' @export
 design_matrix.rbf <- function(x, obs, ...){
@@ -99,7 +101,11 @@ design_matrix.rbf <- function(x, obs, ...){
     H <- matrix(1, nrow = N, ncol = M + 1)
   }else{
     if (x$eq_spaced_mus){
-      mus <- seq(min(obs), max(obs), length.out = M)
+      if (x$whole_region){
+        mus <- seq(-1, 1, length.out = M)
+      }else{
+        mus <- seq(min(obs), max(obs), length.out = M)
+      }
     }else{
       repeat {
         km <- stats::kmeans(obs, M, iter.max = 30, nstart = 10)  # Use K-means

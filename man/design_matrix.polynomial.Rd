@@ -14,9 +14,9 @@
 \item{...}{Additional parameters}
 }
 \value{
-The design matrix H. The dimensions of the matrix H are
-N x (M+1), where N is the length of the observations, and M is the degree of
-the polynomial.
+A list containing the design matrix H. The dimensions of the matrix
+H are N x (M+1), where N is the length of the observations, and M is the
+degree of the polynomial.
 }
 \description{
 \code{design_matrix.polynomial} creates a design matrix H using polynomial

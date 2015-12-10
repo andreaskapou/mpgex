@@ -4,7 +4,8 @@
 \alias{rbf.object}
 \title{Creates an RBF object}
 \usage{
-rbf.object(M = 2, gamma = 1, eq_spaced_mus = FALSE)
+rbf.object(M = 2, gamma = 1, eq_spaced_mus = FALSE,
+  whole_region = FALSE)
 }
 \arguments{
 \item{M}{The degree of the RBF object that will be created.}
@@ -13,6 +14,10 @@ rbf.object(M = 2, gamma = 1, eq_spaced_mus = FALSE)
 
 \item{eq_spaced_mus}{Logical, if TRUE, equally spaced centers are created,
 otherwise centers are created using \code{\link[stats]{kmeans}} algorithm}
+
+\item{whole_region}{Logical, indicating if the centers will be evaluated
+equally spaced on the whole region, or between the min and max of the
+observation values.}
 }
 \value{
 An object of type 'RBF'.
