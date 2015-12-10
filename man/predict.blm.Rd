@@ -7,12 +7,12 @@
 \method{predict}{blm}(object, newdata = NULL, ...)
 }
 \arguments{
+\item{object}{Object of class \code{\link{blm}}.}
+
 \item{newdata}{An optional data frame in which to look for variables with
 which to predict. If omitted, the fitted values are used.}
 
 \item{...}{Optional additional parameters.}
-
-\item{x}{Object of class \code{\link{blm}}.}
 }
 \value{
 \code{predict.blm} produces a vector of predictions.

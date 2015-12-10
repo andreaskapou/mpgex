@@ -23,7 +23,7 @@
 #' }
 #'
 #' @seealso \code{\link{predict.blm}}, \code{\link{polynomial.object}},
-#'  \code{\link{rbf.object}}, \code{\link{summary.blm}
+#'  \code{\link{rbf.object}}, \code{\link{summary.blm}}
 #'
 #' @export
 blm <- function(x, y, basis, lambda = 0){
@@ -73,7 +73,7 @@ blm <- function(x, y, basis, lambda = 0){
 #' however currently it does not provide the \code{\link[stats]{formula}}
 #' functionality.
 #'
-#' @param x Object of class \code{\link{blm}}.
+#' @param object Object of class \code{\link{blm}}.
 #' @param newdata An optional data frame in which to look for variables with
 #'  which to predict. If omitted, the fitted values are used.
 #' @param ... Optional additional parameters.
@@ -150,5 +150,5 @@ print.summary.blm <- function(x, ...){
   cat("Call:\n")
   print(x$call)
   cat("\n")
-  printCoefmat(x$coefficients, P.value=TRUE, has.Pvalue=TRUE)
+  printCoefmat(x$coefficients, P.values=TRUE, has.Pvalue=TRUE)
 }

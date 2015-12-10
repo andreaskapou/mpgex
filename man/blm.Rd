@@ -19,19 +19,23 @@ blm(x, y, basis, lambda = 0)
 An object of class "blm" is a list containing the following
  components:
 \itemize{
- \item \code{coefficients} a named vector of coefficients
+ \item \code{coefficients} a named vector of coefficients.
  \item \code{residuals} the residuals, that is response minus fitted values.
  \item \code{fitted.values} the fitted mean values.
  \item \code{df.residuals} the residual degrees of freedom.
  \item \code{sigma} the standard deviation of the residuals.
- \item \code{vcov} The covariance matrix
- \item \code{basis} The basis object used
- \item \code{lambda} The regularization parameter
- \item \code{call} the matched call
+ \item \code{vcov} The covariance matrix.
+ \item \code{basis} The basis object used.
+ \item \code{lambda} The regularization parameter.
+ \item \code{call} the matched call.
 }
 }
 \description{
 \code{blm} is used to fit linear models using basis functions such as
 Radial Basis Functions (RBFs) and Polynomial Basis Functions.
+}
+\seealso{
+\code{\link{predict.blm}}, \code{\link{polynomial.object}},
+ \code{\link{rbf.object}}, \code{\link{summary.blm}}
 }
 
