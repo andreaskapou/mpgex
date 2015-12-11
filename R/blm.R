@@ -36,7 +36,6 @@ blm <- function(x, y, basis, lambda = 0){
     qx <- qr(H)
     #  Compute (H'H)^(-1)H'y
     est$coefficients <- solve.qr(qx, y)
-
   }else{
     I <- diag(1, NCOL(H))  # Identity matrix
     I[1,1]  <- 0  # Do not change the intercept coefficient
