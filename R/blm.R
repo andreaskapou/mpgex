@@ -41,7 +41,7 @@ blm <- function(x, y, basis, lambda = 0){
     I <- diag(1, NCOL(H))  # Identity matrix
     I[1,1]  <- 0  # Do not change the intercept coefficient
     # Compute QR decomposition
-    qx <- qr(lambda* I + t(H) %*% H)
+    qx <- qr(lambda * I + t(H) %*% H)
     # Compute (lambda * I + H'H)^(-1)H'y
     est$coefficients <- solve.qr(qx, t(H) %*% y)
   }
@@ -53,10 +53,10 @@ blm <- function(x, y, basis, lambda = 0){
   # Residuals
   est$residuals <- y - est$fitted.values
   # Standard deviation of residuals
-  est$sigma <- sqrt(sum(est$residuals^2)/est$df.residuals)
+  est$sigma <- sqrt(sum(est$residuals ^ 2) / est$df.residuals)
 
   # Compute sigma^2 * (x'x)^(-1)
-  est$vcov <- est$sigma^2 * chol2inv(qx$qr)
+  est$vcov <- est$sigma ^ 2 * chol2inv(qx$qr)
   colnames(est$vcov) <- rownames(est$vcov) <- colnames(H)
 
   est$call <- match.call()
@@ -129,9 +129,10 @@ summary.blm <- function(object, ...){
   TAB <- cbind(Estimate = coef(object),
                StdErr = se,
                t.value = tval,
-               p.value = 2*pt(-abs(tval), df=object$df))
-  res <- list(call=object$call,
-              coefficients=TAB)
+               p.value = 2 * pt(-abs(tval), df = object$df))
+  colnames(TAB) <- c("Estimate", "Std.Err", "t value", "Pr(>|t|)")
+  res <- list(call = object$call,
+              coefficients = TAB)
   class(res) <- "summary.blm"
   return(res)
 }
@@ -150,5 +151,5 @@ print.summary.blm <- function(x, ...){
   cat("Call:\n")
   print(x$call)
   cat("\n")
-  printCoefmat(x$coefficients, P.values=TRUE, has.Pvalue=TRUE)
+  printCoefmat(x$coefficients, P.values = TRUE, has.Pvalue = TRUE)
 }

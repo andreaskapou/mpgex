@@ -7,7 +7,7 @@
 design_matrix(x, ...)
 }
 \arguments{
-\item{x}{A \code{\link{polynomial.object}}}
+\item{x}{A basis function object}
 
 \item{...}{Additional parameters}
 }

@@ -18,7 +18,7 @@ plot.polynomial <- function(x, dataset, w, ...){
        col = "darkgreen", pch = 24, xlim = c(xmin, xmax), ylim = c(0,1),
        xlab = "region x", ylab = "methylation level")
   # Draw a line evaluated from the polynomial function
-  lines(x = xs, y=eval_prob_polyn_func(xs, w=w), col=2, lwd=2)
+  lines(x = xs, y=eval_probit_function(x, xs, w=w), col=2, lwd=2)
 }
 
 
@@ -39,8 +39,8 @@ plot.rbf <- function(x, dataset, w, mus, ...){
        col = "darkgreen", pch = 24, xlim = c(xmin, xmax), ylim = c(0,1),
        xlab = "region x", ylab = "methylation level")
   # Draw a line evaluated from the rbf function
-  lines(x=xs, y=eval_prob_rbf_func(xs,
-                                   w = w,
-                                   basis = x,
-                                   mus = mus), col=2, lwd=2)
+  lines(x=xs, y=eval_probit_function(x = x,
+                                     obs = xs,
+                                     w = w,
+                                     mus = mus), col=2, lwd=2)
 }

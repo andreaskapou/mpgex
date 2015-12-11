@@ -49,10 +49,10 @@ performing linear regression in order to predict/regress
 the corresponding differential gene expression data.
 }
 \examples{
-obs <- bpr_data
-Y   <- gex_data
+obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
+Y   <- list(control = gex_control_data, treatment = gex_treatment_data)
 basis <- rbf.object(M = 5, gamma = 0.3)
-out   <- wrapper_mpgex(X = obs, Y = Y, basis = basis)
+out   <- differential_mpgex(X = obs, Y = Y, basis = basis)
 
 }
 \seealso{

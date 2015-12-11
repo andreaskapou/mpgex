@@ -20,8 +20,7 @@ polynomial.object <- function(M = 1){
   # Check that M is integer
   assertthat::assert_that(M %% 1 == 0)
   assertthat::assert_that(M > -1)
-  obj <- list(M = M)
-  class(obj) <- "polynomial"
+  obj <- structure(list(M = M), class = "polynomial")
   return(obj)
 }
 
@@ -34,6 +33,7 @@ polynomial.object <- function(M = 1){
 #'
 #' @param M The degree of the RBF object that will be created.
 #' @param gamma Inverse width of radial basis function.
+#' @param mus Optional centers of RBF function.
 #' @param eq_spaced_mus Logical, if TRUE, equally spaced centers are created,
 #'  otherwise centers are created using \code{\link[stats]{kmeans}} algorithm
 #' @param whole_region Logical, indicating if the centers will be evaluated
@@ -49,12 +49,21 @@ polynomial.object <- function(M = 1){
 #' (obj)
 #'
 #' @export
-rbf.object <- function(M = 2, gamma = 1, eq_spaced_mus = FALSE, whole_region = FALSE){
+rbf.object <- function(M = 2, gamma = 1, mus = NULL, eq_spaced_mus = TRUE,
+                                                      whole_region = FALSE){
   # Check that M is integer
   assertthat::assert_that(M %% 1 == 0)
   assertthat::assert_that(M > -1)
-  obj <- list(M = M, gamma = gamma, eq_spaced_mus = eq_spaced_mus, whole_region = whole_region)
-  class(obj) <- "rbf"
+  if (! is.null(mus)){
+    assertthat::assert_that(is.vector(mus))
+    assertthat::assert_that(M == length(mus))
+  }
+  obj <- structure(list(M = M,
+                        mus = mus,
+                        gamma = gamma,
+                        eq_spaced_mus = eq_spaced_mus,
+                        whole_region = whole_region),
+                   class = "rbf")
   return(obj)
 }
 
@@ -105,122 +114,4 @@ polynomial_basis <- function(X, M = 1){
 #' @export
 rbf_basis <- function(X, mus, gamma = 1){
   return(exp( (-1) * gamma * norm(as.matrix(X - mus), "F") ^ 2))
-}
-
-
-#-------------------------------------------------------------
-
-
-#' Evaluate probit polynomial function
-#'
-#' Method for evaluating the probit transformation of the polynomial function
-#' of degree M for observation data x and coefficients w.
-#'
-#' @inheritParams eval_polyn_func
-#'
-#' @return The probit transformed polynomial function values.
-#'
-#' @examples
-#' x <- c(1,2,3)
-#' w <- c(0.1, 0.3, -0.6)
-#' out <- eval_prob_polyn_func(x, w)
-#'
-#' @export
-eval_prob_polyn_func <- function(x, w){
-  assertthat::assert_that(is.vector(x))
-  assertthat::assert_that(is.vector(w))
-
-  f <- eval_polyn_func(x, w)
-  Phi <- pnorm(f)
-  return(Phi)
-}
-
-
-#' Evaluate probit rbf function
-#'
-#' Method for evaluating the probit transformation of the rbf function
-#' with M basis for observation data x and coefficients w.
-#'
-#' @inheritParams eval_polyn_func
-#' @param basis The basis object.
-#' @param mus The centers of the rbf function.
-#'
-#' @return The probit transformed rbf function values.
-#'
-#' @examples
-#' x <- c(1,2,3)
-#' w <- c(0.1, 0.3, -0.6)
-#' basis <- rbf.object(M = 2)
-#' mus <- c(2,2.5)
-#' out <- eval_prob_rbf_func(x, w, basis, mus)
-#'
-#' @export
-eval_prob_rbf_func <- function(x, w, basis, mus){
-  assertthat::assert_that(is.vector(w))
-
-  f <- eval_rbf_func(x, w, basis, mus)
-  Phi <- pnorm(f)
-  return(Phi)
-}
-
-
-#--------------------------------------------------------
-
-
-#' Evaluate polynomial function
-#'
-#' Method for evaluating the the polynomial function of degree M for
-#' observation data x and coefficients w.
-#'
-#' @param x Input / observation data.
-#' @param w Vector of length M, containing the coefficients of an Mth-order
-#'  basis function.
-#'
-#' @return The polynomial function values.
-#'
-#' @examples
-#' x <- c(1,2,3)
-#' w <- c(0.1, 0.3, -0.6)
-#' out <- eval_polyn_func(x, w)
-#'
-#' @export
-eval_polyn_func <- function(x, w){
-  f <- rep(0, length(x))
-  M <- length(w)
-  for (i in 1:M){
-    f <- f + w[i] * polynomial_basis(x, i - 1)
-  }
-  return(f)
-}
-
-
-#' Evaluate rbf function
-#'
-#' Method for evaluating the rbf function with M basis for observation
-#' data x and coefficients w.
-#'
-#' @inheritParams eval_polyn_func
-#' @param basis The basis object.
-#' @param mus The centers of the rbf function.
-#'
-#' @return The rbf function values.
-#'
-#' @examples
-#' x <- c(1,2,3)
-#' w <- c(0.1, 0.3, -0.6)
-#' basis <- rbf.object(M = 2)
-#' mus <- c(2,2.5)
-#' out <- eval_rbf_func(x, w, basis, mus)
-#'
-#' @export
-eval_rbf_func <- function(x, w, basis, mus){
-  f <- rep(w[1], length(x))
-  M <- basis$M
-  x <- as.matrix(x)
-  for (i in 1:M){
-    f <- f + w[i + 1] * apply(x, 1, rbf_basis,
-                              mus = mus[i],
-                              gamma = basis$gamma)
-  }
-  return(f)
 }

@@ -18,8 +18,8 @@ test_that("design matrix works fine", {
   obs <- c(1,2,3)
   expect_is(design_matrix(polyn, obs), "list")
   expect_error(design_matrix(polyn, cbind(1, obs)))
-  expect_identical(design_matrix(polyn, obs),
-                   list(H=matrix(c(1,1,1,1,2,3,1,4,9), ncol=3)))
+  expect_identical(design_matrix(polyn, obs)$H,
+                   matrix(c(1,1,1,1,2,3,1,4,9), ncol=3))
 
   wr_basis <- list(M=2)
   class(wr_basis) <- "basis_x"

@@ -38,8 +38,9 @@
 #' out   <- wrapper_mpgex(X = obs, Y = Y, basis = basis)
 #'
 #' @export
-wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
-                          w = NULL, train_perc = 0.7, method = "CG", itnmax = 100){
+wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
+                          basis = NULL, w = NULL, train_perc = 0.7,
+                                        method = "CG", itnmax = 100){
 
   # -----------------------------------
   # Compute the optimized parameters of the BPR function for each element in x
@@ -86,7 +87,7 @@ wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
   mpgex <- list(X = X,
                 X_prof  = X_prof,
                 basis   = out_opt$basis,
-                des_mat = out_opt$des_mat,
+                Mus     = out_opt$Mus,
                 method  = method,
                 itnmax  = itnmax,
                 train_data   = train,

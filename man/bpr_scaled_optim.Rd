@@ -32,15 +32,16 @@ the corresponding method. See \code{\link[stats]{optim}} for details.}
 \value{
 A list containing the following elements:
 \itemize{
- \item{ \code{W_opt}: An N x M matrix with the optimized parameter values.
+ \item{ \code{W_opt}: An Nx(M+1) matrix with the optimized parameter values.
    Each row of the matrix corresponds to each element of the list x. The
    columns are of the same length as the parameter vector w (i.e. number
    of basis functions).
  }
- \item{ \code{des_mat}: A list containing the corresponding desing matrices
-   for each element of the list x
- }
+ \item{ \code{Mus}: An NxM matrix with the RBF centers if basis object is
+  \code{\link{rbf.object}}, otherwise NULL.}
  \item{ \code{basis}: The basis object.
+ }
+ \item{ \code{w}: The initial values of the parameters w.
  }
 }
 }

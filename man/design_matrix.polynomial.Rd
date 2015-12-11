@@ -7,16 +7,16 @@
 \method{design_matrix}{polynomial}(x, obs, ...)
 }
 \arguments{
-\item{x}{A 'basis' object.}
+\item{x}{A basis object.}
 
 \item{obs}{A vector of observations.}
 
 \item{...}{Additional parameters}
 }
 \value{
-A list containing the design matrix H. The dimensions of the matrix
-H are N x (M+1), where N is the length of the observations, and M is the
-degree of the polynomial.
+A list containing the design matrix H and the basis object. The
+dimensions of the matrix H are N x (M+1), where N is the length of the
+observations, and M is the degree of the polynomial.
 }
 \description{
 \code{design_matrix.polynomial} creates a design matrix H using polynomial
@@ -25,7 +25,7 @@ basis functions of degree M.
 \examples{
 obj <- polynomial.object(M=2)
 obs <- c(0,.2,.5)
-H <- design_matrix(obj, obs)
+des_mat <- design_matrix(obj, obs)
 
 }
 \seealso{

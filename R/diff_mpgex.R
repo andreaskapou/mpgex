@@ -35,14 +35,15 @@
 #'  \code{\link{design_matrix}}
 #'
 #' @examples
-#' obs <- bpr_data
-#' Y   <- gex_data
+#' obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
+#' Y   <- list(control = gex_control_data, treatment = gex_treatment_data)
 #' basis <- rbf.object(M = 5, gamma = 0.3)
-#' out   <- wrapper_mpgex(X = obs, Y = Y, basis = basis)
+#' out   <- differential_mpgex(X = obs, Y = Y, basis = basis)
 #'
 #' @export
-differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
-                          w = NULL, train_perc = 0.7, method = "CG", itnmax = 100){
+differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
+                               basis = NULL, w = NULL, train_perc = 0.7,
+                                            method = "CG", itnmax = 100){
 
   # -----------------------------------
   # Compute the optimized parameters of the BPR function for control samples

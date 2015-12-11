@@ -7,17 +7,18 @@
 \method{design_matrix}{rbf}(x, obs, ...)
 }
 \arguments{
-\item{x}{A 'basis' object.}
+\item{x}{A basis object.}
 
 \item{obs}{A vector of observations.}
 
 \item{...}{Additional parameters}
 }
 \value{
-A list containing the design matrix \code{H} and the centers of the
-rbf function \code{mus}. The dimensions of the matrix H are N x (M+1), where
-N is the length of the observations, and M is the number of radial basis
-functions. \code{mus} is a vector of length M containg the centers of rbfs.
+A list containing the design matrix \code{H} and the basis object.
+The dimensions of the matrix H are N x (M+1), where N is the length of the
+observations, and M is the number of radial basis functions. The updated
+\code{basis} object contains also the centers of RBFs, if they were not
+already given as input.
 }
 \description{
 \code{design_matrix.rbf} creates a design matrix H using radial
