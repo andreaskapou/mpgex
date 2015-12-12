@@ -25,9 +25,9 @@ observation values.}
 An object of type 'RBF'.
 }
 \description{
-\code{rbf.object} creates objects of type "rbf". These objects can be used as
-input to complex functions in order to perform computation depending on the
-basis function. E.g see \code{\link{design_matrix}} generic function.
+\code{rbf.object} creates objects of class "rbf". These objects can be used
+as input to complex functions in order to perform computation depending on
+the basis function. E.g see \code{\link{design_matrix}} generic function.
 }
 \examples{
 obj <- rbf.object(M=2)

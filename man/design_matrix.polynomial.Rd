@@ -2,7 +2,7 @@
 % Please edit documentation in R/design_matrix.R
 \name{design_matrix.polynomial}
 \alias{design_matrix.polynomial}
-\title{Creates a polynomial design matrix H}
+\title{Create polynomial design matrix H}
 \usage{
 \method{design_matrix}{polynomial}(x, obs, ...)
 }

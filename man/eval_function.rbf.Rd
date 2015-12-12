@@ -22,8 +22,8 @@ basis function.}
 The rbf function values.
 }
 \description{
-Method for evaluating the rbf function with M basis for observation
-data obs and coefficients w.
+Method for evaluating the rbf function with M basis for observation data
+obs and coefficients w.
 }
 \examples{
 x <- rbf.object(M=2)

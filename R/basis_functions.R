@@ -1,13 +1,13 @@
 #' Creates a polynomial object
 #'
-#' \code{polynomial.object} creates objects of type "polynomial". These objects
-#' can be used as input to complex functions in order to perform computation
-#' depending on the basis function. E.g see \code{\link{design_matrix}} generic
-#' function.
+#' \code{polynomial.object} creates objects of class "polynomial". These
+#' objects can be used as input to complex functions in order to perform
+#' computation depending on the basis function. E.g see
+#' \code{\link{design_matrix}} generic function.
 #'
 #' @param M The degree of the polynomial object that will be created.
 #'
-#' @return An object of type 'polynomial'
+#' @return An object of class 'polynomial'
 #'
 #' @seealso \code{\link{design_matrix}}
 #'
@@ -17,7 +17,8 @@
 #'
 #' @export
 polynomial.object <- function(M = 1){
-  # Check that M is integer
+  # Check that M is numberic and integer
+  assertthat::assert_that(is.numeric(M))
   assertthat::assert_that(M %% 1 == 0)
   assertthat::assert_that(M > -1)
   obj <- structure(list(M = M), class = "polynomial")
@@ -27,9 +28,9 @@ polynomial.object <- function(M = 1){
 
 #' Creates an RBF object
 #'
-#' \code{rbf.object} creates objects of type "rbf". These objects can be used as
-#' input to complex functions in order to perform computation depending on the
-#' basis function. E.g see \code{\link{design_matrix}} generic function.
+#' \code{rbf.object} creates objects of class "rbf". These objects can be used
+#' as input to complex functions in order to perform computation depending on
+#' the basis function. E.g see \code{\link{design_matrix}} generic function.
 #'
 #' @param M The degree of the RBF object that will be created.
 #' @param gamma Inverse width of radial basis function.
@@ -51,9 +52,13 @@ polynomial.object <- function(M = 1){
 #' @export
 rbf.object <- function(M = 2, gamma = 1, mus = NULL, eq_spaced_mus = TRUE,
                                                       whole_region = FALSE){
-  # Check that M is integer
+  assertthat::assert_that(is.numeric(M))
+  assertthat::assert_that(is.numeric(gamma))
+  assertthat::assert_that(is.logical(eq_spaced_mus))
+  assertthat::assert_that(is.logical(whole_region))
   assertthat::assert_that(M %% 1 == 0)
   assertthat::assert_that(M > -1)
+  assertthat::assert_that(gamma > 0)
   if (! is.null(mus)){
     assertthat::assert_that(is.vector(mus))
     assertthat::assert_that(M == length(mus))
@@ -96,7 +101,7 @@ polynomial_basis <- function(X, M = 1){
 
 #' Apply radial basis function
 #'
-#' Applied the RBF function to the input X with center mus.
+#' Apply the RBF function to the input X with center mus.
 #'
 #' @param X Input data.
 #' @param mus Centers from where we should compute the distance of the data X.

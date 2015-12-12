@@ -10,25 +10,19 @@ test_that("polynomial function works fine", {
 test_that("polynomial basis object works fine", {
   expect_error(polynomial.object(1.5))
   expect_error(polynomial.object(-1))
+  expect_error(polynomial.object("non-numeric"))
   expect_is(polynomial.object(2), "polynomial")
-})
-
-test_that("design matrix works fine", {
-  polyn <- polynomial.object(M = 2)
-  obs <- c(1,2,3)
-  expect_is(design_matrix(polyn, obs), "list")
-  expect_error(design_matrix(polyn, cbind(1, obs)))
-  expect_identical(design_matrix(polyn, obs)$H,
-                   matrix(c(1,1,1,1,2,3,1,4,9), ncol=3))
-
-  wr_basis <- list(M=2)
-  class(wr_basis) <- "basis_x"
-  expect_error(design_matrix(wr_basis))
 })
 
 test_that("radial basis object works fine", {
   expect_error(rbf.object(1.5))
   expect_error(rbf.object(-1))
+  expect_error(rbf.object("non-numeric"))
+  expect_error(rbf.object(eq_spaced_mus = "non-logical"))
+  expect_error(rbf.object(gamma = "non-numeric"))
+  expect_error(rbf.object(M = 2, gamma = 0))
+  expect_error(rbf.object(M = 2, gamma = 0, mus = c(2,3,4)))
+  expect_is(rbf.object(M = 2, mus = c(2,2)), "rbf")
   expect_is(rbf.object(2), "rbf")
 })
 

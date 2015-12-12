@@ -10,13 +10,13 @@ polynomial.object(M = 1)
 \item{M}{The degree of the polynomial object that will be created.}
 }
 \value{
-An object of type 'polynomial'
+An object of class 'polynomial'
 }
 \description{
-\code{polynomial.object} creates objects of type "polynomial". These objects
-can be used as input to complex functions in order to perform computation
-depending on the basis function. E.g see \code{\link{design_matrix}} generic
-function.
+\code{polynomial.object} creates objects of class "polynomial". These
+objects can be used as input to complex functions in order to perform
+computation depending on the basis function. E.g see
+\code{\link{design_matrix}} generic function.
 }
 \examples{
 obj <- polynomial.object(M=2)

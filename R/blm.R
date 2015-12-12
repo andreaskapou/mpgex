@@ -130,9 +130,9 @@ summary.blm <- function(object, ...){
                t.value = tval,
                p.value = 2 * pt(-abs(tval), df = object$df))
   colnames(TAB) <- c("Estimate", "Std.Err", "t value", "Pr(>|t|)")
-  res <- list(call = object$call,
-              coefficients = TAB)
-  class(res) <- "summary.blm"
+  res <- structure(list(call = object$call,
+                        coefficients = TAB),
+                   class = "summary.blm")
   return(res)
 }
 

@@ -7,19 +7,24 @@
 design_matrix(x, ...)
 }
 \arguments{
-\item{x}{A basis function object}
+\item{x}{A basis function object.}
 
-\item{...}{Additional parameters}
+\item{...}{Additional parameters.}
 }
 \description{
 This is a generic function which calles the appropriate methods depending
-on the class of the object \code{x}. Currently only the 'polynomial' class
-is implemented.
+on the class of the object \code{x}.
 }
 \examples{
 obj <- polynomial.object(M=2)
 obs <- c(0,.2,.5)
-H <- design_matrix(obj, obs)
+polyn <- design_matrix(obj, obs)
+
+#----------------
+
+obj <- rbf.object(M=2)
+obs <- c(0,.2,.5)
+rbf <- design_matrix(obj, obs)
 
 }
 \seealso{

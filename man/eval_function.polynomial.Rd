@@ -20,8 +20,8 @@ basis function.}
 The polynomial function values.
 }
 \description{
-Method for evaluating the the polynomial function of degree M for
-observation data obs and coefficients w.
+Method for evaluating the polynomial function of degree M for observation
+data obs and coefficients w.
 }
 \examples{
 x <- polynomial.object(M=2)

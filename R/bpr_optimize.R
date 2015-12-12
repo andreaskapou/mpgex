@@ -233,7 +233,7 @@ do_checks <- function(w, basis){
     w <- rep(0.1, basis$M + 1)
   }
   if (length(w) != (basis$M + 1) ){
-    stop("Length of coefficients vector should be M + 1, where M is the number of basis functions!")
+    stop("Coefficients vector length should be M+1, M is the number of basis functions!")
   }
   return(list(w = w, basis = basis))
 }

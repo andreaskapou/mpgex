@@ -1,11 +1,10 @@
 #' Generic function for creating a desing matrix H
 #'
 #' This is a generic function which calles the appropriate methods depending
-#' on the class of the object \code{x}. Currently only the 'polynomial' class
-#' is implemented.
+#' on the class of the object \code{x}.
 #'
-#' @param x A basis function object
-#' @param ... Additional parameters
+#' @param x A basis function object.
+#' @param ... Additional parameters.
 #'
 #' @seealso \code{\link{polynomial_basis}}, \code{\link{rbf_basis}},
 #'  \code{\link{design_matrix.polynomial}}, \code{\link{design_matrix.rbf}}
@@ -13,7 +12,13 @@
 #' @examples
 #' obj <- polynomial.object(M=2)
 #' obs <- c(0,.2,.5)
-#' H <- design_matrix(obj, obs)
+#' polyn <- design_matrix(obj, obs)
+#'
+#' #----------------
+#'
+#' obj <- rbf.object(M=2)
+#' obs <- c(0,.2,.5)
+#' rbf <- design_matrix(obj, obs)
 #'
 #' @export
 design_matrix <- function(x, ...){
@@ -27,7 +32,7 @@ design_matrix.default <- function(x, ...){
 }
 
 
-#' Creates a polynomial design matrix H
+#' Create polynomial design matrix H
 #'
 #' \code{design_matrix.polynomial} creates a design matrix H using polynomial
 #' basis functions of degree M.
@@ -52,11 +57,10 @@ design_matrix.polynomial <- function(x, obs, ...){
   assertthat::assert_that(is(x, "polynomial"))
   assertthat::assert_that(is.vector(obs))
 
-  N   <- length(obs)  # Length of the dataset
-  M   <- x$M + 1      # Number of coefficients
-  H <- matrix(1, nrow = N, ncol = M)
-  for (j in 1:M){
-    H[ ,j] <- polynomial_basis(obs, j - 1)  # Compute X^(j-1)
+  N <- length(obs)  # Length of the dataset
+  H <- matrix(1, nrow = N, ncol = x$M + 1)
+  for (j in 1:x$M){
+    H[ ,j + 1] <- polynomial_basis(obs, j)  # Compute X^(j)
   }
   return(list(H = H, basis = x))
 }
@@ -70,16 +74,15 @@ design_matrix.polynomial <- function(x, obs, ...){
 #' @inheritParams design_matrix.polynomial
 #'
 #' @return A list containing the design matrix \code{H} and the basis object.
-#' The dimensions of the matrix H are N x (M+1), where N is the length of the
+#' The dimensions of the matrix H are Nx(M+1), where N is the length of the
 #' observations, and M is the number of radial basis functions. The updated
-#' \code{basis} object contains also the centers of RBFs, if they were not
-#' already given as input.
+#' \code{basis} object contains also the updated centers of RBFs.
 #'
 #' @seealso \code{\link{design_matrix}}, \code{\link{rbf_basis}}
 #'
 #' @examples
-#' obj <- rbf.object(M=2)
-#' obs <- c(0,.2,.5)
+#' obj <- rbf.object(M=3)
+#' obs <- c(0,.2,.5, 0.3)
 #' des_mat <- design_matrix(obj, obs)
 #'
 #' @export
@@ -88,16 +91,17 @@ design_matrix.rbf <- function(x, obs, ...){
   assertthat::assert_that(is.vector(obs))
 
   N   <- length(obs)  # Length of the dataset
-  # If number of basis functions is higher than the total observations
   if (x$M > N - 1){
     stop("Number of basis functions is higher than number of observations!")
   }
   if (x$M == 0){
-    H <- matrix(1, nrow = N, ncol = x$M + 1)
+    H <- matrix(1, nrow = N, ncol = 1)
+    x$mus <- 0
   }else{
     if (is.null(x$mus)){
       if (x$eq_spaced_mus){
         if (x$whole_region){
+          # TODO: Should this be deleted?
           x$mus <- seq(-1, 1, length.out = x$M)
         }else{
           x$mus <- seq(min(obs), max(obs), length.out = x$M)
@@ -116,7 +120,7 @@ design_matrix.rbf <- function(x, obs, ...){
     obs <- as.matrix(obs)
     H <- matrix(1, nrow = N, ncol = x$M)
     for (j in 1:x$M){
-      # TODO: Implement the multivariate case!
+      # TODO: Implement the multivariate case
       H[ ,j] <- apply(obs, 1, rbf_basis, mus = x$mus[j], gamma = x$gamma)
     }
     H <- cbind (1 , H)  # Add the 'bias' term

@@ -30,7 +30,7 @@ eval_probit_function <- function(x, ...){
 #'
 #' @inheritParams eval_probit_function
 #'
-#' @seealso \code{\link{eval_probit_function}},\code{\link{eval_function.rbf}},
+#' @seealso \code{\link{eval_probit_function}}, \code{\link{eval_function.rbf}},
 #'  \code{\link{eval_function.polynomial}}
 #'
 #' @examples
@@ -55,14 +55,14 @@ eval_function <- function(x, ...){
 
 # Default function for the generic function 'eval_function'
 eval_function.default <- function(x, ...){
-  stop(paste("Object of type '", class(x), "' is not implemented.", sep = ""))
+  stop(paste("Object of class '", class(x), "' is not implemented.", sep = ""))
 }
 
 
 #' Evaluate polynomial function
 #'
-#' Method for evaluating the the polynomial function of degree M for
-#' observation data obs and coefficients w.
+#' Method for evaluating the polynomial function of degree M for observation
+#' data obs and coefficients w.
 #'
 #' @param x The basis function object.
 #' @param obs Input / observation data.
@@ -84,10 +84,9 @@ eval_function.polynomial <- function(x, obs, w, ...){
   assertthat::assert_that(is.vector(obs))
   assertthat::assert_that(is.vector(w))
 
-  f <- rep(0, length(obs))
-  M <- length(w)
-  for (i in 1:M){
-    f <- f + w[i] * polynomial_basis(obs, i - 1)
+  f <- rep(w[1], length(obs))
+  for (i in 1:x$M){
+    f <- f + w[i + 1] * polynomial_basis(obs, i)
   }
   return(f)
 }
@@ -95,8 +94,8 @@ eval_function.polynomial <- function(x, obs, w, ...){
 
 #' Evaluate rbf function
 #'
-#' Method for evaluating the rbf function with M basis for observation
-#' data obs and coefficients w.
+#' Method for evaluating the rbf function with M basis for observation data
+#' obs and coefficients w.
 #'
 #' @inheritParams eval_function.polynomial
 #' @param mus The centers of the rbf function.

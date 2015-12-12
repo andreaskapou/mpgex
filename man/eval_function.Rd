@@ -31,7 +31,7 @@ out <- eval_function(x, obs, w)
 
 }
 \seealso{
-\code{\link{eval_probit_function}},\code{\link{eval_function.rbf}},
+\code{\link{eval_probit_function}}, \code{\link{eval_function.rbf}},
  \code{\link{eval_function.polynomial}}
 }
 
