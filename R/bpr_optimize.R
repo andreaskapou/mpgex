@@ -46,11 +46,13 @@ bpr_optim.default <- function(x, ...){
 #'    columns are of the same length as the parameter vector w (i.e. number
 #'    of basis functions).
 #'  }
-#'  \item{ \code{Mus}: An NxM matrix with the RBF centers if basis object is
+#'  \item{ \code{Mus}: An N x M matrix with the RBF centers if basis object is
 #'   \code{\link{rbf.object}}, otherwise NULL.}
 #'  \item{ \code{basis}: The basis object.
 #'  }
 #'  \item{ \code{w}: The initial values of the parameters w.
+#'  }
+#'  \item{ \code{x_extrema}: The min and max values of each promoter region.
 #'  }
 #' }
 #'
@@ -65,101 +67,39 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
                                                       itnmax = 100, ...){
   N <- length(x)
   assertthat::assert_that(N > 0)
-
   out <- do_checks(w = w, basis = basis)
   w   <- out$w
   basis <- out$basis
 
-  # Matrix for storing all the coefficients for each element of list x
+  # Data frame for storing all the coefficients for each element of list x
   W_opt <- matrix(NA_real_, nrow = N, ncol = length(w))
-  colnames(W_opt) <- paste("w", seq(1,length(w)), sep = "")
+  colnames(W_opt) <- paste("w", seq(1, length(w)), sep = "")
+  # Matrix for storing the centers of RBFs if object class is 'rbf'
   Mus <- NULL
   if (is(basis, "rbf")){
     Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
     colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
   }
-
+  x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
   # Perform optimization for each element of list x,
   # i.e. for each promoter region i.
   for (i in 1:N){
-    out_opt <- bpr_optim.matrix(x = x[[i]],
-                                w = w,
-                                basis = basis,
+    out_opt <- bpr_optim.matrix(x      = x[[i]],
+                                w      = w,
+                                basis  = basis,
                                 method = method,
                                 itnmax = itnmax)
     W_opt[i, ] <- out_opt$w_opt
     if (is(basis, "rbf")){
       Mus[i, ] <- out_opt$basis$mus
     }
+    x_extrema[i, ] <- out_opt$x_extrema
   }
-  return(list(W_opt = W_opt, Mus = Mus, basis = basis, w = w))
-}
-
-
-#' Optimization method for the scaled BPR NLL function using list x
-#'
-#' \code{bpr_scaled_optim} minimizes the negative log likelihood of the scaled
-#' BPR function. Since it cannot be evaluated analytically, an optimization
-#' procedure is used. The \code{\link[stats]{optim}} packages is used for
-#' performing optimization. This method calls \code{\link{bpr_optim.matrix}}
-#' to process each element of the list.
-#'
-#' @param x A list of elements of length N, where each element is an L x 3
-#'  matrix of observations, where 1st column contains the locations. The 2nd
-#'  and 3rd columns contain the total trials and number of successes at the
-#'  corresponding locations, repsectively.
-#' @param W_contr An N x M matrix containing the basis coefficients of a
-#'  previously fitted profile. Each row will be used as a constant vector
-#'  which will be scaled when performing optimization on the new profiles.
-#' @inheritParams bpr_optim.matrix
-#'
-#' @return A list containing the following elements:
-#' \itemize{
-#'  \item{ \code{W_opt}: An Nx(M+1) matrix with the optimized parameter values.
-#'    Each row of the matrix corresponds to each element of the list x. The
-#'    columns are of the same length as the parameter vector w (i.e. number
-#'    of basis functions).
-#'  }
-#'  \item{ \code{Mus}: An NxM matrix with the RBF centers if basis object is
-#'   \code{\link{rbf.object}}, otherwise NULL.}
-#'  \item{ \code{basis}: The basis object.
-#'  }
-#'  \item{ \code{w}: The initial values of the parameters w.
-#'  }
-#' }
-#'
-#' @seealso \code{\link{bpr_optim.matrix}}
-#'
-#'
-#' @export
-bpr_scaled_optim <- function(x, W_contr, w = NULL, basis = NULL,
-                                   method = "CG", itnmax = 100, ...){
-  N <- length(x)
-  assertthat::assert_that(N > 0)
-
-  # Data frame for storing all the coefficients for each element of list x
-  W_opt <- matrix(NA_real_, nrow = N, ncol = length(w))
-  colnames(W_opt) <- paste("w", seq(1,length(w)), sep = "")
-  Mus <- NULL
-  if (is(basis, "rbf")){
-    Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
-    colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
-  }
-
-  # Perform optimization for each element of list x, using the W_contr
-  # parameters in order to get a scaled version of the profiles.
-  for (i in 1:N){
-    out_opt <- bpr_optim.matrix(x = x[[i]],
-                                w = (W_contr[i,] + 1e-10) * w,
-                                basis = basis,
-                                method = method,
-                                itnmax = itnmax)
-    W_opt[i, ] <- out_opt$w_opt
-    if (is(basis, "rbf")){
-      Mus[i, ] <- out_opt$basis$mus
-    }
-  }
-  return(list(W_opt = W_opt, Mus = Mus, basis = basis, w = w))
+  return(list(W_opt = W_opt,
+              Mus = Mus,
+              basis = basis,
+              w = w,
+              x_extrema = x_extrema))
 }
 
 
@@ -186,7 +126,7 @@ bpr_scaled_optim <- function(x, W_contr, w = NULL, basis = NULL,
 #'  \item{ \code{w_opt}: Optimized values for the coefficient vector w.
 #'    The length of the result is the same as the length of the vector w.
 #'  }
-#'  \item{ \code{des_mat}: The desing matrix used in optimization procedure.
+#'  \item{ \code{basis}: The basis object.
 #'  }
 #' }
 #'
@@ -220,7 +160,9 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG",
                  data    = data,
                  is_NLL  = TRUE)$par
 
-  return(list(w_opt = as.matrix(w_opt), basis = basis))
+  return(list(w_opt = as.matrix(w_opt),
+              basis = basis,
+              x_extrema = c(min(obs), max(obs))))
 }
 
 
@@ -233,7 +175,7 @@ do_checks <- function(w, basis){
     w <- rep(0.1, basis$M + 1)
   }
   if (length(w) != (basis$M + 1) ){
-    stop("Coefficients vector length should be M+1, M is the number of basis functions!")
+    stop("Coefficients vector should be M+1, M: number of basis functions!")
   }
   return(list(w = w, basis = basis))
 }

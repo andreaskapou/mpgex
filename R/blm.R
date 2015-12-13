@@ -7,6 +7,8 @@
 #' @param y The response.
 #' @param basis Basis function object e.g. \code{\link{rbf.object}}.
 #' @param lambda Optional parameter for performing penalized least squares.
+#' @param return.all Optional logical, indicating if all the metrics should be
+#'  computed (mainly for efficiency).
 #'
 #' @return An object of class "blm" is a list containing the following
 #'  components:
@@ -26,7 +28,7 @@
 #'  \code{\link{rbf.object}}, \code{\link{summary.blm}}
 #'
 #' @export
-blm <- function(x, y, basis, lambda = 0){
+blm <- function(x, y, basis, lambda = 0, return.all = TRUE){
   est <- list(basis = basis, lambda = lambda)
   # Create the design matrix
   des_mat <- design_matrix(x = basis, obs = x)
@@ -45,19 +47,19 @@ blm <- function(x, y, basis, lambda = 0){
     est$coefficients <- solve.qr(qx, t(H) %*% y)
   }
 
-  # Degrees of freedom
-  est$df.residuals <- NROW(x) - NCOL(x)
-  # Fitted values
-  est$fitted.values <- as.vector(H %*% est$coefficients)
-  # Residuals
-  est$residuals <- y - est$fitted.values
-  # Standard deviation of residuals
-  est$sigma <- sqrt(sum(est$residuals ^ 2) / est$df.residuals)
-
-  # Compute sigma^2 * (x'x)^(-1)
-  est$vcov <- est$sigma ^ 2 * chol2inv(qx$qr)
-  colnames(est$vcov) <- rownames(est$vcov) <- colnames(H)
-
+  if (return.all){
+    # Fitted values
+    est$fitted.values <- as.vector(H %*% est$coefficients)
+    # Residuals
+    est$residuals <- y - est$fitted.values
+    # Degrees of freedom
+    est$df.residuals <- NROW(x) - NCOL(x)
+    # Standard deviation of residuals
+    est$sigma <- sqrt(sum(est$residuals ^ 2) / est$df.residuals)
+    # Compute sigma^2 * (x'x)^(-1)
+    est$vcov <- est$sigma ^ 2 * chol2inv(qx$qr)
+    colnames(est$vcov) <- rownames(est$vcov) <- colnames(H)
+  }
   est$call <- match.call()
   class(est) <- "blm"
 

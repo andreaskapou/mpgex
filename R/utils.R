@@ -76,3 +76,70 @@ partition_data <- function(X, Y, train_ind = NULL, train_perc = 0.7){
   }
   return(list(train = train, test = test, train_ind = train_ind))
 }
+
+
+#' Calculate error metrics
+#'
+#' \code{calculate_errors} calculates error metrics so as to assess the
+#'  performance of a model, e.g. linear regression.
+#' @param x Actual values.
+#' @param y Predicted values.
+#' @param summary Logical, indicating if the erorr metrics should be printed.
+#'
+#' @return A list containing the following components:
+#' \itemize{
+#'  \item \code{mae} mean absolute error.
+#'  \item \code{mse}  mean squared error (the variance).
+#'  \item \code{rmse} root mean squared error (std dev).
+#'  \item \code{mape} mean absolute percentage error.
+#'  \item \code{rstd} relative standard deviation.
+#' }
+#'
+#' @examples
+#' # Example data
+#' actual <- c(4, 6, 9, 10, 4, 6, 4, 7, 8, 7)
+#' predicted <- c(5, 6, 8, 10, 4, 8, 4, 9, 8, 9)
+#'
+#' calculate_errors(actual, predicted, summary = TRUE)
+#'
+#' @export
+calculate_errors <- function(x, y, summary = FALSE){
+  R <- list()
+  if (! is.numeric(x) || ! is.numeric(y))
+    stop("Arguments 'x' and 'y' must be numeric vectors.")
+  if (length(x) != length(y))
+    stop("Vectors 'x' and ' y' must have the same length.")
+  error  <- y - x
+  # mean absolute error
+  R$mae  <- mean(abs(error))
+  mae_f  <- formatC(R$mae, digits = 4, format = "f")
+  # mean squared error (the variance?!)
+  R$mse  <- mean((error)^2)
+  mse_f  <- formatC(R$mse, digits = 4, format = "f")
+  # root mean squared error (std. dev.)
+  R$rmse <- sqrt(R$mse)
+  rmse_f <- formatC(R$rmse, digits = 4, format = "f")
+  # mean absolute percentage error
+  R$mape <- mean(abs((error)/x))
+  mape_f <- formatC(R$mape, digits = 4, format = "f")
+  # relative standard deviation
+  R$rstd <- R$rmse/mean(x)
+  rstd_f <- formatC(R$rstd, digits = 4, format = "f")
+  R$rsq  <- 1 - (sum((y - x)^2) / sum((x - mean(x))^2))
+  rsq_f  <- formatC(R$rsq, digits = 4, format = "f")
+  if (summary) {
+    cat("-- Error Terms ----\n")
+    cat(" MAE:  ", mae_f, "\n")
+    cat(" MSE:  ", mse_f, "\n")
+    cat(" RMSE: ", rmse_f, "\n")
+    cat(" MAPE: ", mape_f, "\n")
+    cat(" rSTD: ", rstd_f, "\n")
+    cat(" R-sq: ", rsq_f, "\n")
+    cat("-------------------\n\n")
+  }
+  if (summary) {
+    invisible(R)
+  }else{
+    return(R)
+  }
+}

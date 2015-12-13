@@ -1,4 +1,4 @@
-#' Wrapper function for predicting gene expression from methylation profiles
+#' Predict gene expression from methylation profiles
 #'
 #' \code{wrapper_mpgex} is a function that wraps all the necessary subroutines
 #' for performing predictions on gene expressions. Initially, it optimizes the
@@ -25,7 +25,7 @@
 #' @param itnmax Optional parameter for defining the max number of iterations
 #'  of the optimization procedure, see \code{\link[stats]{optim}}.
 #'
-#' @return An mpgex object consisting of the following elements:
+#' @return An mpgex object consisting of the following elements: ...
 #'
 #' @seealso \code{\link{bpr_optim}}, \code{\link{bpr_likelihood}},
 #'  \code{\link{polynomial.object}}, \code{\link{rbf.object}},
@@ -42,61 +42,31 @@ wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                           basis = NULL, w = NULL, train_perc = 0.7,
                                         method = "CG", itnmax = 100){
 
-  # -----------------------------------
-  # Compute the optimized parameters of the BPR function for each element in x
+  # Optimize the BPR function for each element in x
   out_opt <- bpr_optim(x = X,
                        w = w,
                        basis = basis,
                        method = method,
                        itnmax = itnmax)
 
-  # ------------------------------------
   # Create training and test sets
-  X_prof <- NULL
-  X_prof <- out_opt$W_opt
-  dataset <- partition_data(X = X_prof,
+  dataset <- partition_data(X = out_opt$W_opt,
                             Y = Y,
                             train_ind  = train_ind,
                             train_perc = train_perc)
-  train   <- dataset$train
-  test    <- dataset$test
 
-  # ------------------------------------
-  # Make predictions based on the methylation profiles singatures.
-  if (is.null(formula)){
-    fit_model  <- stats::lm(formula = Y ~ ., data = train)
-  }else{
-    fit_model  <- stats::lm(formula = formula, data = train)
-  }
-  train_pred <- stats::predict(object = fit_model)
-
-  regressors <- 1:(NCOL(test) - 1)
-  if (! NCOL(test) == 2){
-    test_pred  <- stats::predict(object  = fit_model,
-                                 newdata = test[ ,regressors])
-  }else{
-    test_pred  <- stats::predict(object  = fit_model,
-                                 newdata = data.frame(X = test[ ,regressors]))
-  }
-
-  # Compute the prediction errors
-  train_rmserr <- pracma::rmserr(train$Y, train_pred, summary = TRUE)
-  test_rmserr  <- pracma::rmserr(test$Y,  test_pred,  summary = TRUE)
+  # Predict gene expression from methylation profiles
+  mpgex <- predict_gex(formula = formula,
+                       train   = dataset$train,
+                       test    = dataset$test)
 
   # Create an 'mpgex' object
-  mpgex <- list(X = X,
-                X_prof  = X_prof,
-                basis   = out_opt$basis,
-                Mus     = out_opt$Mus,
-                method  = method,
-                itnmax  = itnmax,
-                train_data   = train,
-                test_data    = test,
-                fit_model    = fit_model,
-                train_pred   = train_pred,
-                test_pred    = test_pred,
-                train_rmserr = train_rmserr,
-                test_rmserr  = test_rmserr)
+  mpgex$basis  <- out_opt$basis
+  mpgex$W_opt  <- out_opt$W_opt
+  mpgex$Mus    <- out_opt$Mus
+  mpgex$method <- method
+  mpgex$itnmax <- itnmax
+  mpgex$train_ind <- train_ind
   class(mpgex) <- "mpgex"
 
   return(mpgex)
