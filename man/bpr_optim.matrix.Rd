@@ -30,7 +30,7 @@ A list containing the following elements:
  \item{ \code{w_opt}: Optimized values for the coefficient vector w.
    The length of the result is the same as the length of the vector w.
  }
- \item{ \code{des_mat}: The desing matrix used in optimization procedure.
+ \item{ \code{basis}: The basis object.
  }
 }
 }

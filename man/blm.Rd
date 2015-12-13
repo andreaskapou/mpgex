@@ -4,7 +4,7 @@
 \alias{blm}
 \title{Fitting linear models using Basis Functions}
 \usage{
-blm(x, y, basis, lambda = 0)
+blm(x, y, basis, lambda = 0, return.all = TRUE)
 }
 \arguments{
 \item{x}{The observations.}
@@ -14,6 +14,9 @@ blm(x, y, basis, lambda = 0)
 \item{basis}{Basis function object e.g. \code{\link{rbf.object}}.}
 
 \item{lambda}{Optional parameter for performing penalized least squares.}
+
+\item{return.all}{Optional logical, indicating if all the metrics should be
+computed (mainly for efficiency).}
 }
 \value{
 An object of class "blm" is a list containing the following

@@ -33,11 +33,13 @@ A list containing the following elements:
    columns are of the same length as the parameter vector w (i.e. number
    of basis functions).
  }
- \item{ \code{Mus}: An NxM matrix with the RBF centers if basis object is
+ \item{ \code{Mus}: An N x M matrix with the RBF centers if basis object is
   \code{\link{rbf.object}}, otherwise NULL.}
  \item{ \code{basis}: The basis object.
  }
  \item{ \code{w}: The initial values of the parameters w.
+ }
+ \item{ \code{x_extrema}: The min and max values of each promoter region.
  }
 }
 }

@@ -4,12 +4,12 @@
 \alias{plot.polynomial}
 \title{S3 plot method for polynomial objects}
 \usage{
-\method{plot}{polynomial}(x, dataset, w, ...)
+\method{plot}{polynomial}(x, obs, w, ...)
 }
 \arguments{
-\item{x}{Object type, which actually is the basis object.}
+\item{x}{The basis object.}
 
-\item{dataset}{An L x 3 matrix containing the observations data.}
+\item{obs}{An L x 3 matrix containing the observations data.}
 
 \item{w}{Vector of length M, containing the fitted parameters / coefficients
 for the M basis functions.}

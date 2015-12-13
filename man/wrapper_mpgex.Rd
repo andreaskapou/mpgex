@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper_mpgex.R
 \name{wrapper_mpgex}
 \alias{wrapper_mpgex}
-\title{Wrapper function for predicting gene expression from methylation profiles}
+\title{Predict gene expression from methylation profiles}
 \usage{
 wrapper_mpgex(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
   w = NULL, train_perc = 0.7, method = "CG", itnmax = 100)
@@ -35,7 +35,7 @@ optimization procedure, see \code{\link[stats]{optim}}.}
 of the optimization procedure, see \code{\link[stats]{optim}}.}
 }
 \value{
-An mpgex object consisting of the following elements:
+An mpgex object consisting of the following elements: ...
 }
 \description{
 \code{wrapper_mpgex} is a function that wraps all the necessary subroutines
