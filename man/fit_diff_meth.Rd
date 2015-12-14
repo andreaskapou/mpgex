@@ -4,7 +4,7 @@
 \alias{fit_diff_meth}
 \title{Fit differential methylation profiles using BLM}
 \usage{
-fit_diff_meth(control, treatment, diff_basis, lambda)
+fit_diff_meth(control, treatment, diff_basis, lambda, evals = 50)
 }
 \arguments{
 \item{control}{The optimized values for the control samples.}
@@ -13,13 +13,16 @@ fit_diff_meth(control, treatment, diff_basis, lambda)
 
 \item{diff_basis}{The basis object for differential methylation.}
 
-\item{lambda}{The regularization parameter when fitting BLM.}
+\item{lambda}{The regularization parameter when fitting the BLM.}
+
+\item{evals}{Integer denoting the number of evaluation points.}
 }
 \value{
-The fitted coefficients
+The differential methylation profiles and the corresponding fitted
+ coefficients from the BLM.
 }
 \description{
-Function for fitting the differential methylation profiles and getting back
+Function for fitting the differential methylation profiles and returning
 the fitted coefficients using the Basis Linear Model.
 }
 

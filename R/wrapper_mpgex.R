@@ -64,9 +64,11 @@ wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
   mpgex$basis  <- out_opt$basis
   mpgex$W_opt  <- out_opt$W_opt
   mpgex$Mus    <- out_opt$Mus
+  mpgex$train  <- dataset$train
+  mpgex$test   <- dataset$test
   mpgex$method <- method
   mpgex$itnmax <- itnmax
-  mpgex$train_ind <- train_ind
+  mpgex$train_ind <- dataset$train_ind
   class(mpgex) <- "mpgex"
 
   return(mpgex)

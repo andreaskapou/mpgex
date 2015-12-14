@@ -81,8 +81,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
     colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
   }
   x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
-  # Perform optimization for each element of list x,
-  # i.e. for each promoter region i.
+  # Perform optimization for each element of x, i.e. for each region i.
   for (i in 1:N){
     out_opt <- bpr_optim.matrix(x      = x[[i]],
                                 w      = w,
@@ -160,7 +159,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG",
                  data    = data,
                  is_NLL  = TRUE)$par
 
-  return(list(w_opt = as.matrix(w_opt),
+  return(list(w_opt = w_opt,
               basis = basis,
               x_extrema = c(min(obs), max(obs))))
 }

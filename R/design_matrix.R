@@ -59,8 +59,10 @@ design_matrix.polynomial <- function(x, obs, ...){
 
   N <- length(obs)  # Length of the dataset
   H <- matrix(1, nrow = N, ncol = x$M + 1)
-  for (j in 1:x$M){
-    H[ ,j + 1] <- polynomial_basis(obs, j)  # Compute X^(j)
+  if (x$M > 0){
+    for (j in 1:x$M){
+      H[ ,j + 1] <- polynomial_basis(obs, j)  # Compute X^(j)
+    }
   }
   return(list(H = H, basis = x))
 }
@@ -120,7 +122,7 @@ design_matrix.rbf <- function(x, obs, ...){
     obs <- as.matrix(obs)
     H <- matrix(1, nrow = N, ncol = x$M)
     for (j in 1:x$M){
-      # TODO: Implement the multivariate case
+      # TODO: Implement the multivariate case if needed
       H[ ,j] <- apply(obs, 1, rbf_basis, mus = x$mus[j], gamma = x$gamma)
     }
     H <- cbind (1 , H)  # Add the 'bias' term

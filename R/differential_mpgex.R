@@ -47,15 +47,15 @@ differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                              itnmax  = itnmax)
 
 
-  W_opt <- fit_diff_meth(control = out_contr_opt,
-                         treatment = out_treat_opt,
-                         diff_basis = out_contr_opt$basis,
-                         lambda = lambda)$W_opt
+  out_diff_meth <- fit_diff_meth(control    = out_contr_opt,
+                                 treatment  = out_treat_opt,
+                                 diff_basis = out_contr_opt$basis,
+                                 lambda     = lambda)
 
   diff_expr <- Y$control - Y$treatment
 
   # Create training and test sets
-  dataset <- partition_data(X = W_opt,
+  dataset <- partition_data(X = out_diff_meth$W_opt,
                             Y = diff_expr,
                             train_ind  = train_ind,
                             train_perc = train_perc)
@@ -65,17 +65,21 @@ differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                        train   = dataset$train,
                        test    = dataset$test)
 
-  # Create an 'mpgex' object
-  mpgex$basis  <- out_treat_opt$basis
-  mpgex$W_opt  <- W_opt
+  # Create a 'diff_mpgex' object
+  mpgex$basis       <- out_contr_opt$basis
+  mpgex$diff_basis  <- out_diff_meth$diff_basis
+  mpgex$W_opt       <- out_diff_meth$W_opt
+  mpgex$diff_meth   <- out_diff_meth$diff_meth
   mpgex$method <- method
   mpgex$itnmax <- itnmax
+  mpgex$train  <- dataset$train
+  mpgex$test   <- dataset$test
   mpgex$contr_opt <- out_contr_opt
   mpgex$treat_opt <- out_treat_opt
   mpgex$diff_expr <- diff_expr
   mpgex$train_ind <- train_ind
 
-  class(mpgex) <- "diff-mpgex"
+  class(mpgex) <- "diff_mpgex"
 
   return(mpgex)
 }

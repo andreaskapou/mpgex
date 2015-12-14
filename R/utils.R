@@ -114,18 +114,18 @@ calculate_errors <- function(x, y, summary = FALSE){
   R$mae  <- mean(abs(error))
   mae_f  <- formatC(R$mae, digits = 4, format = "f")
   # mean squared error (the variance?!)
-  R$mse  <- mean((error)^2)
+  R$mse  <- mean(error ^ 2)
   mse_f  <- formatC(R$mse, digits = 4, format = "f")
   # root mean squared error (std. dev.)
   R$rmse <- sqrt(R$mse)
   rmse_f <- formatC(R$rmse, digits = 4, format = "f")
   # mean absolute percentage error
-  R$mape <- mean(abs((error)/x))
+  R$mape <- mean(abs(error / x))
   mape_f <- formatC(R$mape, digits = 4, format = "f")
   # relative standard deviation
-  R$rstd <- R$rmse/mean(x)
+  R$rstd <- R$rmse / mean(x)
   rstd_f <- formatC(R$rstd, digits = 4, format = "f")
-  R$rsq  <- 1 - (sum((y - x)^2) / sum((x - mean(x))^2))
+  R$rsq  <- 1 - (sum(error ^ 2) / sum((x - mean(x)) ^ 2))
   rsq_f  <- formatC(R$rsq, digits = 4, format = "f")
   if (summary) {
     cat("-- Error Terms ----\n")

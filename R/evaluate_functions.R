@@ -84,8 +84,10 @@ eval_function.polynomial <- function(x, obs, w, ...){
   assertthat::assert_that(is.vector(w))
 
   f <- rep(w[1], length(obs))
-  for (i in 1:x$M){
-    f <- f + w[i + 1] * polynomial_basis(obs, i)
+  if (x$M > 0){
+    for (i in 1:x$M){
+      f <- f + w[i + 1] * polynomial_basis(obs, i)
+    }
   }
   return(f)
 }
@@ -114,10 +116,12 @@ eval_function.rbf <- function(x, obs, w, ...){
 
   f <- rep(w[1], length(obs))
   obs <- as.matrix(obs)
-  for (i in 1:x$M){
-    f <- f + w[i + 1] * apply(obs, 1, rbf_basis,
-                              mus = x$mus[i],
-                              gamma = x$gamma)
+  if (x$M > 0){
+    for (i in 1:x$M){
+      f <- f + w[i + 1] * apply(obs, 1, rbf_basis,
+                                mus = x$mus[i],
+                                gamma = x$gamma)
+    }
   }
   return(f)
 }
