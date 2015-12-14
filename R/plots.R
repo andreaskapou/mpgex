@@ -43,6 +43,7 @@ plot.rbf <- function(x, obs, w, ...){
                                      w   = w), col=2, lwd=2)
 }
 
+
 #' Plot method for differential methylation
 #'
 #' Plot data using the differntial methylation data

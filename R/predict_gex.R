@@ -25,19 +25,19 @@
 #' @export
 predict_gex <- function(formula = NULL, train, test){
   if (is.null(formula)){
-    model <- stats::lm(formula = Y ~ ., data = train)
+    model <- lm(formula = Y ~ ., data = train)
   }else{
-    model <- stats::lm(formula = formula, data = train)
+    model <- lm(formula = formula, data = train)
   }
   train_pred <- fitted(object = model)
 
   regressors <- 1:(NCOL(test) - 1)
   if (! NCOL(test) == 2){
-    test_pred <- stats::predict(object  = model,
-                                newdata = test[ ,regressors])
+    test_pred <- predict(object  = model,
+                         newdata = test[ ,regressors])
   }else{
-    test_pred <- stats::predict(object  = model,
-                                newdata = data.frame(X = test[ ,regressors]))
+    test_pred <- predict(object  = model,
+                         newdata = data.frame(X = test[ ,regressors]))
   }
   # Calculate model errors
   message("-- Train Errors --")
