@@ -48,6 +48,7 @@ plot.rbf <- function(x, obs, w, ...){
 #'
 #' @param x Object of class 'diff_mpgex'
 #' @param t Region to plot
+#' @param ... Additional parameters
 #'
 #' @export
 plot.diff_mpgex <- function(x, t, ...){
@@ -71,6 +72,8 @@ plot.diff_mpgex <- function(x, t, ...){
 #'
 #' @param x Object of class 'diff_mpgex'
 #' @param t Region to plot
+#' @param ... Additional parameters
+#'
 #'
 #' @export
 plot_diff_mpgex <- function(x, t, ...){

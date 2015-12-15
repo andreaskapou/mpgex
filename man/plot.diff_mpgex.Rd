@@ -10,6 +10,8 @@
 \item{x}{Object of class 'diff_mpgex'}
 
 \item{t}{Region to plot}
+
+\item{...}{Additional parameters}
 }
 \description{
 Plot data using the differntial methylation data
