@@ -38,9 +38,9 @@
 #' out   <- wrapper_mpgex(X = obs, Y = Y, basis = basis)
 #'
 #' @export
-wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
-                          basis = NULL, w = NULL, train_perc = 0.7,
-                                        method = "CG", itnmax = 100){
+wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
+                          train_ind = NULL, basis = NULL, w = NULL,
+                          train_perc = 0.7, method = "CG", itnmax = 100){
 
   # Optimize the BPR function for each element in x
   out_opt <- bpr_optim(x = X,
@@ -56,9 +56,10 @@ wrapper_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                             train_perc = train_perc)
 
   # Predict gene expression from methylation profiles
-  mpgex <- predict_gex(formula = formula,
-                       train   = dataset$train,
-                       test    = dataset$test)
+  mpgex <- predict_gex(formula    = formula,
+                       model_name = model_name,
+                       train      = dataset$train,
+                       test       = dataset$test)
 
   # Create an 'mpgex' object
   mpgex$basis  <- out_opt$basis

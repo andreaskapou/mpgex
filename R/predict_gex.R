@@ -23,9 +23,14 @@
 #' @seealso \code{\link{calculate_errors}}
 #'
 #' @export
-predict_gex <- function(formula = NULL, train, test){
+predict_gex <- function(formula = NULL, model_name = "lm", train, test){
   if (is.null(formula)){
-    model <- lm(formula = Y ~ ., data = train)
+    formula <- Y ~ .
+  }
+  if (model_name == "mars"){
+    model <- earth(formula = formula, data = train)
+  }else if (model_name == "randomForest"){
+    model <- randomForest(formula = formula, data = train)
   }else{
     model <- lm(formula = formula, data = train)
   }
