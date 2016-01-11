@@ -52,7 +52,7 @@ differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                                  diff_basis = out_contr_opt$basis,
                                  lambda     = lambda)
 
-  diff_expr <- Y$control - Y$treatment
+  diff_expr <- (Y$control + 1e-01) / (Y$treatment + 1e-01)
 
   # Create training and test sets
   dataset <- partition_data(X = out_diff_meth$W_opt,
