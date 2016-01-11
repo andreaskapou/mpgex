@@ -4,8 +4,9 @@
 \alias{wrapper_mpgex}
 \title{Predict gene expression from methylation profiles}
 \usage{
-wrapper_mpgex(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
-  w = NULL, train_perc = 0.7, method = "CG", itnmax = 100)
+wrapper_mpgex(formula = NULL, X, Y, model_name = "lm", train_ind = NULL,
+  basis = NULL, w = NULL, train_perc = 0.7, method = "CG",
+  itnmax = 100)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -16,6 +17,8 @@ regression. If NULL, the simple linear regression method is used.}
 where each element is an L x 3 dimensional matrix.}
 
 \item{Y}{Corresponding gene expression data for each element of the list X}
+
+\item{model_name}{A charcter denoting the regression model}
 
 \item{train_ind}{Optional argument containing the indices for splitting the
 dataset to train and test sets.}

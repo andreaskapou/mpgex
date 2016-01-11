@@ -13,6 +13,7 @@
 #' @param X The binomial distributed observations, which has to be a list
 #'  where each element is an L x 3 dimensional matrix.
 #' @param Y Corresponding gene expression data for each element of the list X
+#' @param model_name A charcter denoting the regression model
 #' @param train_ind Optional argument containing the indices for splitting the
 #'  dataset to train and test sets.
 #' @param basis Optional basis function object, default is

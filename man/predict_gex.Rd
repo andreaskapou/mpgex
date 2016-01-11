@@ -4,12 +4,14 @@
 \alias{predict_gex}
 \title{Predict gene expression data from methylation profiles}
 \usage{
-predict_gex(formula = NULL, train, test)
+predict_gex(formula = NULL, model_name = "lm", train, test)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
 calling the \code{\link[stats]{lm}} function for performing linear
 regression. If NULL, the simple linear regression model is used.}
+
+\item{model_name}{A charcter denoting the regression model}
 
 \item{train}{The training data}
 
