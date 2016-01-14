@@ -6,7 +6,7 @@
 \usage{
 wrapper_mpgex(formula = NULL, X, Y, model_name = "lm", train_ind = NULL,
   basis = NULL, w = NULL, train_perc = 0.7, method = "CG",
-  itnmax = 100)
+  itnmax = 100, is_summary = TRUE)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -36,6 +36,8 @@ optimization procedure, see \code{\link[stats]{optim}}.}
 
 \item{itnmax}{Optional parameter for defining the max number of iterations
 of the optimization procedure, see \code{\link[stats]{optim}}.}
+
+\item{is_summary}{Logical, print the summary statistics.}
 }
 \value{
 An mpgex object consisting of the following elements: ...

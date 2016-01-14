@@ -15,4 +15,5 @@ RoxygenNote: 5.0.1
 Imports: assertthat,
     MASS,
     earth,
-    randomForest
+    randomForest,
+    e1071

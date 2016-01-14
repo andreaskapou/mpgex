@@ -25,6 +25,7 @@
 #'  optimization procedure, see \code{\link[stats]{optim}}.
 #' @param itnmax Optional parameter for defining the max number of iterations
 #'  of the optimization procedure, see \code{\link[stats]{optim}}.
+#' @param is_summary Logical, print the summary statistics.
 #'
 #' @return An mpgex object consisting of the following elements: ...
 #'
@@ -41,7 +42,8 @@
 #' @export
 wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
                           train_ind = NULL, basis = NULL, w = NULL,
-                          train_perc = 0.7, method = "CG", itnmax = 100){
+                          train_perc = 0.7, method = "CG", 
+                          itnmax = 100, is_summary = TRUE){
 
   # Optimize the BPR function for each element in x
   out_opt <- bpr_optim(x = X,
@@ -60,7 +62,8 @@ wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
   mpgex <- predict_gex(formula    = formula,
                        model_name = model_name,
                        train      = dataset$train,
-                       test       = dataset$test)
+                       test       = dataset$test,
+                       is_summary = is_summary)
 
   # Create an 'mpgex' object
   mpgex$basis  <- out_opt$basis

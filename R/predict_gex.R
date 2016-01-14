@@ -8,8 +8,9 @@
 #'  calling the \code{\link[stats]{lm}} function for performing linear
 #'  regression. If NULL, the simple linear regression model is used.
 #' @param model_name A charcter denoting the regression model
-#' @param train The training data
-#' @param test The test data
+#' @param train The training data.
+#' @param test The test data.
+#' @param is_summary Logical, print the summary statistics.
 #'
 #' @return A list containing the following elements:
 #' \itemize{
@@ -24,7 +25,7 @@
 #' @seealso \code{\link{calculate_errors}}
 #'
 #' @export
-predict_gex <- function(formula = NULL, model_name = "lm", train, test){
+predict_gex <- function(formula = NULL, model_name = "lm", train, test, is_summary = TRUE){
   if (is.null(formula)){
     formula <- Y ~ .
   }
@@ -34,6 +35,8 @@ predict_gex <- function(formula = NULL, model_name = "lm", train, test){
     model <- randomForest::randomForest(formula = formula, data = train)
   }else if (model_name == "rlm"){
     model <- MASS::rlm(formula = formula, data = train)
+  }else if (model_name == "svm"){
+    model <- e1071::svm(formula = formula, data = train, kernel='radial', cross=10)
   }else{
     model <- lm(formula = formula, data = train)
   }
@@ -54,9 +57,9 @@ predict_gex <- function(formula = NULL, model_name = "lm", train, test){
 
   # Calculate model errors
   message("-- Train Errors --")
-  train_errors <- calculate_errors(train$Y, train_pred, summary = TRUE)
+  train_errors <- calculate_errors(train$Y, train_pred, summary = is_summary)
   message("-- Test Errors --")
-  test_errors  <- calculate_errors(test$Y,  test_pred,  summary = TRUE)
+  test_errors  <- calculate_errors(test$Y,  test_pred,  summary = is_summary)
 
   out <- list(formula      = formula,
               gex_model    = model,

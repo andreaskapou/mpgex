@@ -4,7 +4,8 @@
 \alias{predict_gex}
 \title{Predict gene expression data from methylation profiles}
 \usage{
-predict_gex(formula = NULL, model_name = "lm", train, test)
+predict_gex(formula = NULL, model_name = "lm", train, test,
+  is_summary = TRUE)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -13,9 +14,11 @@ regression. If NULL, the simple linear regression model is used.}
 
 \item{model_name}{A charcter denoting the regression model}
 
-\item{train}{The training data}
+\item{train}{The training data.}
 
-\item{test}{The test data}
+\item{test}{The test data.}
+
+\item{is_summary}{Logical, print the summary statistics.}
 }
 \value{
 A list containing the following elements:
