@@ -42,30 +42,40 @@
 #' @export
 wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
                           train_ind = NULL, basis = NULL, w = NULL,
-                          train_perc = 0.7, method = "CG", 
+                          train_perc = 0.7, method = "CG",
                           itnmax = 100, is_summary = TRUE){
 
   # Optimize the BPR function for each element in x
-  out_opt <- bpr_optim(x = X,
-                       w = w,
-                       basis = basis,
+  out_opt <- bpr_optim(x      = X,
+                       w      = w,
+                       basis  = basis,
                        method = method,
                        itnmax = itnmax)
 
   # Create training and test sets
-  dataset <- partition_data(X = out_opt$W_opt,
-                            Y = Y,
+  dataset <- partition_data(X          = out_opt$W_opt,
+                            Y          = Y,
                             train_ind  = train_ind,
                             train_perc = train_perc)
 
+  # Train regression model from methylation profiles
+  train_model <- train_model_gex(formula    = formula,
+                                 model_name = model_name,
+                                 train      = dataset$train,
+                                 is_summary = is_summary)
+
   # Predict gene expression from methylation profiles
-  mpgex <- predict_gex(formula    = formula,
-                       model_name = model_name,
-                       train      = dataset$train,
-                       test       = dataset$test,
-                       is_summary = is_summary)
+  mpgex <- predict_model_gex(model      = train_model$gex_model,
+                             test       = dataset$test,
+                             is_summary = is_summary)
 
   # Create an 'mpgex' object
+  mpgex$gex_model    <- train_model$gex_model
+  mpgex$formula      <- formula
+  mpgex$model_name   <- model_name
+  mpgex$train_pred   <- train_model$train_pred
+  mpgex$train_errors <- train_model$train_errors
+  mpgex$train_ind    <- dataset$train_ind
   mpgex$basis  <- out_opt$basis
   mpgex$W_opt  <- out_opt$W_opt
   mpgex$Mus    <- out_opt$Mus
@@ -73,7 +83,7 @@ wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
   mpgex$test   <- dataset$test
   mpgex$method <- method
   mpgex$itnmax <- itnmax
-  mpgex$train_ind <- dataset$train_ind
+
   class(mpgex) <- "mpgex"
 
   return(mpgex)

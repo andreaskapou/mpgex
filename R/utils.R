@@ -125,8 +125,12 @@ calculate_errors <- function(x, y, summary = FALSE){
   # relative standard deviation
   R$rstd <- R$rmse / mean(x)
   rstd_f <- formatC(R$rstd, digits = 4, format = "f")
+  # R-Squared
   R$rsq  <- 1 - (sum(error ^ 2) / sum((x - mean(x)) ^ 2))
   rsq_f  <- formatC(R$rsq, digits = 4, format = "f")
+  # Pearson Correlation Coefficient
+  R$pcc  <- cor(x, y)
+  pcc_f  <- formatC(R$pcc, digits = 4, format = "f")
   if (summary) {
     cat("-- Error Terms ----\n")
     cat(" MAE:  ", mae_f, "\n")
@@ -135,6 +139,7 @@ calculate_errors <- function(x, y, summary = FALSE){
     cat(" MAPE: ", mape_f, "\n")
     cat(" rSTD: ", rstd_f, "\n")
     cat(" R-sq: ", rsq_f, "\n")
+    cat(" PCC:  ", pcc_f, "\n")
     cat("-------------------\n\n")
   }
   if (summary) {
