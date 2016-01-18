@@ -63,8 +63,8 @@ bpr_optim.default <- function(x, ...){
 #' out_opt <- bpr_optim(x = data, method = "CG")
 #'
 #' @export
-bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
-                                                      itnmax = 100, ...){
+bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
+                                          method = "CG", itnmax = 100, ...){
   N <- length(x)
   assertthat::assert_that(N > 0)
   out <- do_checks(w = w, basis = basis)
@@ -72,9 +72,15 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
   basis <- out$basis
 
   # Data frame for storing all the coefficients for each element of list x
-  W_opt <- matrix(NA_real_, nrow = N, ncol = length(w))
-  colnames(W_opt) <- paste("w", seq(1, length(w)), sep = "")
+  if (is.null(fit_feature)){
+    num_features = length(w)
+  }else{
+    num_features = length(w) + 1
+  }
+  W_opt <- matrix(NA_real_, nrow = N, ncol = num_features)
+  colnames(W_opt) <- paste("w", seq(1, num_features), sep = "")
   # Matrix for storing the centers of RBFs if object class is 'rbf'
+
   Mus <- NULL
   if (is(basis, "rbf")){
     Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
@@ -83,11 +89,12 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
   x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
   # Perform optimization for each element of x, i.e. for each region i.
   for (i in 1:N){
-    out_opt <- bpr_optim.matrix(x      = x[[i]],
-                                w      = w,
-                                basis  = basis,
-                                method = method,
-                                itnmax = itnmax)
+    out_opt <- bpr_optim.matrix(x           = x[[i]],
+                                w           = w,
+                                basis       = basis,
+                                fit_feature = fit_feature,
+                                method      = method,
+                                itnmax      = itnmax)
     W_opt[i, ] <- out_opt$w_opt
     if (is(basis, "rbf")){
       Mus[i, ] <- out_opt$basis$mus
@@ -114,6 +121,8 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
 #'  successes at the corresponding locations, repsectively.
 #' @param w A vector of parameters (i.e. coefficients of the basis functions)
 #' @param basis A 'basis' object. See \code{\link{polynomial.object}}
+#' @param fit_feature Additional feature on how well the profile fits the
+#'  methylation data.
 #' @param method The optimization method to be used. See \code{\link[stats]{optim}}
 #'  for possible methods. Default is 'CG'.
 #' @param itnmax Optional argument giving the maximum number of iterations for
@@ -135,13 +144,13 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, method = "CG",
 #' basis <- polynomial.object(M=2)
 #' w <- c(0.1, 0.1, 0.1)
 #' data <- bpr_data[[1]]
-#' out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG")
+#' out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG", fit_feature = "NLL")
 #'
 #' @importFrom stats optim
 #'
 #' @export
-bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG",
-                                                        itnmax = 100, ...){
+bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
+                                          method = "CG", itnmax = 100, ...){
   obs <- as.vector(x[ ,1])
   data <- x[ ,2:3]
   # Create design matrix H
@@ -158,6 +167,22 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, method = "CG",
                  H       = H,
                  data    = data,
                  is_NLL  = TRUE)$par
+
+  # If we need to add the goodness of fit to the data as feature
+  if (!is.null(fit_feature)){
+    if (identical(fit_feature, "NLL")){
+      fit <- bpr_likelihood(w = w_opt,
+                            H = H,
+                            data = data,
+                            is_NLL = TRUE)
+    }else if (identical(fit_feature, "RMSE")){
+      # Predictions of the target variables
+      f_pred <- as.vector(pnorm(H %*% w_opt))
+      f_true <- data[,2] / data[, 1]
+      fit <- sqrt(mean((f_pred - f_true) ^ 2))
+    }
+    w_opt <- c(w_opt, fit)
+  }
 
   return(list(w_opt = w_opt,
               basis = basis,

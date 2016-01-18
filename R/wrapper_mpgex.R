@@ -21,6 +21,8 @@
 #' @param w Optional vector of initial parameter / coefficient values.
 #' @param train_perc Optional parameter for defining the percentage of the
 #'  dataset to be used for training set, the remaining will be the test set.
+#' @param fit_feature Additional feature on how well the profile fits the
+#'  methylation data.
 #' @param method Parameter for defining the method to be used in the
 #'  optimization procedure, see \code{\link[stats]{optim}}.
 #' @param itnmax Optional parameter for defining the max number of iterations
@@ -40,17 +42,17 @@
 #' out   <- wrapper_mpgex(X = obs, Y = Y, basis = basis)
 #'
 #' @export
-wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
-                          train_ind = NULL, basis = NULL, w = NULL,
-                          train_perc = 0.7, method = "CG",
-                          itnmax = 100, is_summary = TRUE){
+wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm", train_ind = NULL,
+                          basis = NULL, w = NULL, train_perc = 0.7, fit_feature = NULL,
+                          method = "CG", itnmax = 100, is_summary = TRUE){
 
   # Optimize the BPR function for each element in x
-  out_opt <- bpr_optim(x      = X,
-                       w      = w,
-                       basis  = basis,
-                       method = method,
-                       itnmax = itnmax)
+  out_opt <- bpr_optim(x           = X,
+                       w           = w,
+                       basis       = basis,
+                       fit_feature = fit_feature,
+                       method      = method,
+                       itnmax      = itnmax)
 
   # Create training and test sets
   dataset <- partition_data(X          = out_opt$W_opt,

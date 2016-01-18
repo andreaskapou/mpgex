@@ -4,8 +4,8 @@
 \alias{bpr_optim.list}
 \title{Optimization method for the BPR NLL function using list x}
 \usage{
-\method{bpr_optim}{list}(x, w = NULL, basis = NULL, method = "CG",
-  itnmax = 100, ...)
+\method{bpr_optim}{list}(x, w = NULL, basis = NULL, fit_feature = NULL,
+  method = "CG", itnmax = 100, ...)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -16,6 +16,9 @@ corresponding locations, repsectively.}
 \item{w}{A vector of parameters (i.e. coefficients of the basis functions)}
 
 \item{basis}{A 'basis' object. See \code{\link{polynomial.object}}}
+
+\item{fit_feature}{Additional feature on how well the profile fits the
+methylation data.}
 
 \item{method}{The optimization method to be used. See \code{\link[stats]{optim}}
 for possible methods. Default is 'CG'.}

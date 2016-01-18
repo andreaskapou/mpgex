@@ -4,8 +4,8 @@
 \alias{bpr_optim.matrix}
 \title{Optimization method for the BPR NLL using matrix x}
 \usage{
-\method{bpr_optim}{matrix}(x, w = NULL, basis = NULL, method = "CG",
-  itnmax = 100, ...)
+\method{bpr_optim}{matrix}(x, w = NULL, basis = NULL, fit_feature = NULL,
+  method = "CG", itnmax = 100, ...)
 }
 \arguments{
 \item{x}{An L x 3 matrix of observations, where 1st column contains the
@@ -15,6 +15,9 @@ successes at the corresponding locations, repsectively.}
 \item{w}{A vector of parameters (i.e. coefficients of the basis functions)}
 
 \item{basis}{A 'basis' object. See \code{\link{polynomial.object}}}
+
+\item{fit_feature}{Additional feature on how well the profile fits the
+methylation data.}
 
 \item{method}{The optimization method to be used. See \code{\link[stats]{optim}}
 for possible methods. Default is 'CG'.}
@@ -44,7 +47,7 @@ performing optimization.
 basis <- polynomial.object(M=2)
 w <- c(0.1, 0.1, 0.1)
 data <- bpr_data[[1]]
-out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG")
+out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG", fit_feature = "NLL")
 
 }
 \seealso{
