@@ -1,4 +1,4 @@
-#' Generic function for creating a desing matrix H
+#' Generic function for creating a design matrix H
 #'
 #' This is a generic function which calles the appropriate methods depending
 #' on the class of the object \code{x}.
@@ -94,7 +94,7 @@ design_matrix.rbf <- function(x, obs, ...){
 
   N   <- length(obs)  # Length of the dataset
   if (x$M > N - 1){
-    stop("Number of basis functions is higher than number of observations!")
+    stop("Number of basis functions should be less than observations!")
   }
   if (x$M == 0){
     H <- matrix(1, nrow = N, ncol = 1)
@@ -103,7 +103,7 @@ design_matrix.rbf <- function(x, obs, ...){
     if (is.null(x$mus)){
       if (x$eq_spaced_mus){
         if (x$whole_region){
-          # TODO: Should this be deleted?
+          # TODO: Should this be deleted or get in another way the min, max?
           x$mus <- seq(-1, 1, length.out = x$M)
         }else{
           x$mus <- seq(min(obs), max(obs), length.out = x$M)
@@ -120,12 +120,10 @@ design_matrix.rbf <- function(x, obs, ...){
     }
     # Convert the 'obs' vector to an N x 1 dimensional matrix
     obs <- as.matrix(obs)
-    H <- matrix(1, nrow = N, ncol = x$M)
+    H <- matrix(1, nrow = N, ncol = x$M + 1)
     for (j in 1:x$M){
-      # TODO: Implement the multivariate case if needed
-      H[ ,j] <- apply(obs, 1, rbf_basis, mus = x$mus[j], gamma = x$gamma)
+      H[ ,j + 1] <- apply(obs, 1, rbf_basis, mus = x$mus[j], gamma = x$gamma)
     }
-    H <- cbind (1 , H)  # Add the 'bias' term
   }
   return(list(H = H, basis = x))
 }

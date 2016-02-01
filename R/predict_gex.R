@@ -25,22 +25,30 @@
 #' @seealso \code{\link{calculate_errors}}
 #'
 #' @export
-predict_gex <- function(formula = NULL, model_name = "lm", train, test, is_summary = TRUE){
+predict_gex <- function(formula = NULL, model_name = "lm", train, test,
+                                                         is_summary = TRUE){
   if (is.null(formula)){
     formula <- Y ~ .
   }
   if (model_name == "mars"){
-    model <- earth::earth(formula = formula, data = train)
+    model <- earth::earth(formula = formula,
+                          data = train)
   }else if (model_name == "randomForest"){
-    model <- randomForest::randomForest(formula = formula, data = train)
+    model <- randomForest::randomForest(formula = formula,
+                                        data = train)
   }else if (model_name == "rlm"){
-    model <- MASS::rlm(formula = formula, data = train)
+    model <- MASS::rlm(formula = formula,
+                       data = train)
   }else if (model_name == "svm"){
-    model <- e1071::svm(formula = formula, data = train, kernel='radial', cross=10)
+    model <- e1071::svm(formula = formula,
+                        data = train,
+                        kernel="radial",
+                        cross=10)
   }else{
-    model <- lm(formula = formula, data = train)
+    model <- lm(formula = formula,
+                data = train)
   }
-  #train_pred <- fitted(object = model)
+
   train_pred <- predict(object = model,
                         type = "response")
 

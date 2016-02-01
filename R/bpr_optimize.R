@@ -73,9 +73,9 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 
   # Data frame for storing all the coefficients for each element of list x
   if (is.null(fit_feature)){
-    num_features = length(w)
+    num_features <- length(w)
   }else{
-    num_features = length(w) + 1
+    num_features <- length(w) + 1
   }
   W_opt <- matrix(NA_real_, nrow = N, ncol = num_features)
   colnames(W_opt) <- paste("w", seq(1, num_features), sep = "")

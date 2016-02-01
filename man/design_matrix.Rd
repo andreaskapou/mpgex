@@ -2,7 +2,7 @@
 % Please edit documentation in R/design_matrix.R
 \name{design_matrix}
 \alias{design_matrix}
-\title{Generic function for creating a desing matrix H}
+\title{Generic function for creating a design matrix H}
 \usage{
 design_matrix(x, ...)
 }

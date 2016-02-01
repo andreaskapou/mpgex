@@ -21,28 +21,37 @@
 #' @seealso \code{\link{calculate_errors}}, \code{\link{predict_model_gex}}
 #'
 #' @export
-train_model_gex <- function(formula = NULL, model_name = "lm", train, is_summary = TRUE){
+train_model_gex <- function(formula = NULL, model_name = "lm", train,
+                                                    is_summary = TRUE){
   if (is.null(formula)){
     formula <- Y ~ .
   }
   if (model_name == "mars"){
-    model <- earth::earth(formula = formula, data = train)
+    model <- earth::earth(formula = formula,
+                          data = train)
   }else if (model_name == "randomForest"){
-    model <- randomForest::randomForest(formula = formula, data = train)
+    model <- randomForest::randomForest(formula = formula,
+                                        data = train)
   }else if (model_name == "rlm"){
-    model <- MASS::rlm(formula = formula, data = train)
+    model <- MASS::rlm(formula = formula,
+                       data = train)
   }else if (model_name == "svm"){
-    model <- e1071::svm(formula = formula, data = train, kernel='radial', cross=10)
+    model <- e1071::svm(formula = formula,
+                        data = train,
+                        kernel="radial",
+                        cross=10)
   }else{
-    model <- lm(formula = formula, data = train)
+    model <- lm(formula = formula,
+                data = train)
   }
 
-  #train_pred <- fitted(object = model)
   train_pred <- predict(object = model,
                         type = "response")
 
   # Calculate model errors
-  message("-- Train Errors --")
+  if (is_summary){
+    message("-- Train Errors --")
+  }
   train_errors <- calculate_errors(train$Y, train_pred, summary = is_summary)
 
   out <- list(formula      = formula,
