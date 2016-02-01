@@ -125,7 +125,7 @@ calculate_errors <- function(x, y, summary = FALSE){
   # relative standard deviation
   R$rstd <- R$rmse / mean(x)
   rstd_f <- formatC(R$rstd, digits = 4, format = "f")
-  # R-Squared
+  # r-squared
   R$rsq  <- 1 - (sum(error ^ 2) / sum((x - mean(x)) ^ 2))
   rsq_f  <- formatC(R$rsq, digits = 4, format = "f")
   # Pearson Correlation Coefficient
@@ -147,4 +147,27 @@ calculate_errors <- function(x, y, summary = FALSE){
   }else{
     return(R)
   }
+}
+
+
+#' Compute stable Log-Sum-Exp
+#'
+#' \code{log_sum_exp} computes the log sum exp trick for avoiding numeric
+#' underflow and have numeric stability in computations of small numbers.
+#'
+#' @param x A vector of observations
+#'
+#' @return The logs-sum-exp value
+#'
+#' @references
+#'  \url{https://hips.seas.harvard.edu/blog/2013/01/09/computing-log-sum-exp/}
+#'
+#' @examples
+#' x <- c(0.001, 0.5, 2, 1.4, 1.5)
+#' out <- log_sum_exp(x)
+#' @export
+log_sum_exp <- function(x) {
+  # Computes log(sum(exp(x))
+  offset <- max(x)
+  return(log(sum(exp(x - offset))) + offset)
 }
