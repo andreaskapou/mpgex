@@ -5,7 +5,8 @@
 \title{Predict differntial gene expression from differential methylation}
 \usage{
 differential_mpgex(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
-  w = NULL, train_perc = 0.7, method = "CG", itnmax = 100, lambda = 0)
+  w = NULL, train_perc = 0.7, opt_method = "CG", opt_itnmax = 100,
+  lambda = 0)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -29,11 +30,11 @@ dataset to train and test sets.}
 \item{train_perc}{Optional parameter for defining the percentage of the
 dataset to be used for training set, the remaining will be the test set.}
 
-\item{method}{Parameter for defining the method to be used in the
+\item{opt_method}{Parameter for defining the method to be used in the
 optimization procedure, see \code{\link[stats]{optim}}.}
 
-\item{itnmax}{Optional parameter for defining the max number of iterations
-of the optimization procedure, see \code{\link[stats]{optim}}.}
+\item{opt_itnmax}{Optional parameter for defining the max number of
+iterations of the optimization procedure, see \code{\link[stats]{optim}}.}
 
 \item{lambda}{Regularization term when performing Basis Linear Model fitting}
 }

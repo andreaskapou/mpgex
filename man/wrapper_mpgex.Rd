@@ -6,7 +6,7 @@
 \usage{
 wrapper_mpgex(formula = NULL, X, Y, model_name = "lm", train_ind = NULL,
   basis = NULL, w = NULL, train_perc = 0.7, fit_feature = NULL,
-  method = "CG", itnmax = 100, is_summary = TRUE)
+  opt_method = "CG", opt_itnmax = 100, is_summary = TRUE)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -34,11 +34,11 @@ dataset to be used for training set, the remaining will be the test set.}
 \item{fit_feature}{Additional feature on how well the profile fits the
 methylation data.}
 
-\item{method}{Parameter for defining the method to be used in the
+\item{opt_method}{Parameter for defining the method to be used in the
 optimization procedure, see \code{\link[stats]{optim}}.}
 
-\item{itnmax}{Optional parameter for defining the max number of iterations
-of the optimization procedure, see \code{\link[stats]{optim}}.}
+\item{opt_itnmax}{Optional parameter for defining the max number of
+iterations of the optimization procedure, see \code{\link[stats]{optim}}.}
 
 \item{is_summary}{Logical, print the summary statistics.}
 }

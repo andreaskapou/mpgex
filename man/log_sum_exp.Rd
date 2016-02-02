@@ -17,7 +17,7 @@ The logs-sum-exp value
 underflow and have numeric stability in computations of small numbers.
 }
 \examples{
-x <- c(0.001, 0.5, 2, 100, 15)
+x <- c(0.001, 0.5, 2, 1.4, 1.5)
 out <- log_sum_exp(x)
 }
 \references{

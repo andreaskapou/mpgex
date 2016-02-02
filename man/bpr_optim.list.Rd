@@ -5,7 +5,7 @@
 \title{Optimization method for the BPR NLL function using list x}
 \usage{
 \method{bpr_optim}{list}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  method = "CG", itnmax = 100, ...)
+  opt_method = "CG", opt_itnmax = 100, ...)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -20,11 +20,11 @@ corresponding locations, repsectively.}
 \item{fit_feature}{Additional feature on how well the profile fits the
 methylation data.}
 
-\item{method}{The optimization method to be used. See \code{\link[stats]{optim}}
-for possible methods. Default is 'CG'.}
+\item{opt_method}{The optimization method to be used. See
+\code{\link[stats]{optim}} for possible methods. Default is 'CG'.}
 
-\item{itnmax}{Optional argument giving the maximum number of iterations for
-the corresponding method. See \code{\link[stats]{optim}} for details.}
+\item{opt_itnmax}{Optional argument giving the maximum number of iterations
+for the corresponding method. See \code{\link[stats]{optim}} for details.}
 
 \item{...}{Additional parameters}
 }
@@ -54,8 +54,8 @@ performing optimization. This method calls \code{\link{bpr_optim.matrix}}
 to process each element of the list.
 }
 \examples{
-data <- bpr_data
-out_opt <- bpr_optim(x = data, method = "CG")
+ex_data <- bpr_data
+out_opt <- bpr_optim(x = ex_data, opt_method = "CG")
 
 }
 \seealso{

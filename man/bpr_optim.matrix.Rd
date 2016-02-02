@@ -5,7 +5,7 @@
 \title{Optimization method for the BPR NLL using matrix x}
 \usage{
 \method{bpr_optim}{matrix}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  method = "CG", itnmax = 100, ...)
+  opt_method = "CG", opt_itnmax = 100, ...)
 }
 \arguments{
 \item{x}{An L x 3 matrix of observations, where 1st column contains the
@@ -19,11 +19,11 @@ successes at the corresponding locations, repsectively.}
 \item{fit_feature}{Additional feature on how well the profile fits the
 methylation data.}
 
-\item{method}{The optimization method to be used. See \code{\link[stats]{optim}}
-for possible methods. Default is 'CG'.}
+\item{opt_method}{The optimization method to be used. See
+\code{\link[stats]{optim}} for possible methods. Default is 'CG'.}
 
-\item{itnmax}{Optional argument giving the maximum number of iterations for
-the corresponding method. See \code{\link[stats]{optim}} for details.}
+\item{opt_itnmax}{Optional argument giving the maximum number of iterations
+for the corresponding method. See \code{\link[stats]{optim}} for details.}
 
 \item{...}{Additional parameters}
 }
@@ -47,7 +47,7 @@ performing optimization.
 basis <- polynomial.object(M=2)
 w <- c(0.1, 0.1, 0.1)
 data <- bpr_data[[1]]
-out_opt <- bpr_optim(x = data, w = w, basis = basis, method = "CG", fit_feature = "NLL")
+out_opt <- bpr_optim(x = data, w = w, basis = basis, fit_feature = "NLL")
 
 }
 \seealso{
