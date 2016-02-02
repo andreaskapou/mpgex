@@ -4,7 +4,7 @@
 \alias{differential_mpgex}
 \title{Predict differntial gene expression from differential methylation}
 \usage{
-differential_mpgex(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
+differential_mpgex(formula = NULL, x, y, train_ind = NULL, basis = NULL,
   w = NULL, train_perc = 0.7, opt_method = "CG", opt_itnmax = 100,
   lambda = 0)
 }
@@ -13,11 +13,11 @@ differential_mpgex(formula = NULL, X, Y, train_ind = NULL, basis = NULL,
 calling the \code{\link[stats]{lm}} function for performing linear
 regression. If NULL, the simple linear regression method is used.}
 
-\item{X}{The binomial distributed observations. A list containing two lists
+\item{x}{The binomial distributed observations. A list containing two lists
 for control and treatment samples. Each of the two lists has a nested list
 where each element is an L x 3 dimensional matrix.}
 
-\item{Y}{Corresponding gene expression data for each element of the list X}
+\item{y}{Corresponding gene expression data for each element of the list x}
 
 \item{train_ind}{Optional argument containing the indices for splitting the
 dataset to train and test sets.}
@@ -54,9 +54,9 @@ corresponding differential gene expression data.
 }
 \examples{
 obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
-Y   <- list(control = gex_control_data, treatment = gex_treatment_data)
+y   <- list(control = gex_control_data, treatment = gex_treatment_data)
 basis <- rbf.object(M = 5, gamma = 0.3)
-out   <- differential_mpgex(X = obs, Y = Y, basis = basis, lambda = 1e-02)
+out   <- differential_mpgex(x = obs, y = y, basis = basis, lambda = 1e-02)
 
 }
 \seealso{
