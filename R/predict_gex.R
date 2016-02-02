@@ -28,7 +28,7 @@
 predict_gex <- function(formula = NULL, model_name = "lm", train, test,
                                                          is_summary = TRUE){
   if (is.null(formula)){
-    formula <- Y ~ .
+    formula <- y ~ .
   }
   if (model_name == "mars"){
     model <- earth::earth(formula = formula,
@@ -59,15 +59,15 @@ predict_gex <- function(formula = NULL, model_name = "lm", train, test,
                          type = "response")
   }else{
     test_pred <- predict(object  = model,
-                         newdata = data.frame(X = test[ ,regressors]),
+                         newdata = data.frame(x = test[ ,regressors]),
                          type = "response")
   }
 
   # Calculate model errors
   message("-- Train Errors --")
-  train_errors <- calculate_errors(train$Y, train_pred, summary = is_summary)
+  train_errors <- calculate_errors(train$y, train_pred, is_summary)
   message("-- Test Errors --")
-  test_errors  <- calculate_errors(test$Y,  test_pred,  summary = is_summary)
+  test_errors  <- calculate_errors(test$y,  test_pred, is_summary)
 
   out <- list(formula      = formula,
               gex_model    = model,

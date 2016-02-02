@@ -26,7 +26,7 @@ predict_model_gex <- function(model, test, is_summary = TRUE){
                          type = "response")
   }else{
     test_pred <- predict(object  = model,
-                         newdata = data.frame(X = test[ ,regressors]),
+                         newdata = data.frame(x = test[ ,regressors]),
                          type = "response")
   }
 
@@ -34,7 +34,9 @@ predict_model_gex <- function(model, test, is_summary = TRUE){
   if (is_summary){
     message("-- Test Errors --")
   }
-  test_errors  <- calculate_errors(test$Y,  test_pred,  summary = is_summary)
+  test_errors  <- calculate_errors(x = test$y,
+                                   y = test_pred,
+                                   summary = is_summary)
 
   out <- list(test_pred    = test_pred,
               test_errors  = test_errors)

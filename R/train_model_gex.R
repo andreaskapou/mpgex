@@ -24,7 +24,7 @@
 train_model_gex <- function(formula = NULL, model_name = "lm", train,
                                                     is_summary = TRUE){
   if (is.null(formula)){
-    formula <- Y ~ .
+    formula <- y ~ .
   }
   if (model_name == "mars"){
     model <- earth::earth(formula = formula,
@@ -52,7 +52,9 @@ train_model_gex <- function(formula = NULL, model_name = "lm", train,
   if (is_summary){
     message("-- Train Errors --")
   }
-  train_errors <- calculate_errors(train$Y, train_pred, summary = is_summary)
+  train_errors <- calculate_errors(x = train$y,
+                                   y = train_pred,
+                                   summary = is_summary)
 
   out <- list(formula      = formula,
               gex_model    = model,

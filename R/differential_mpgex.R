@@ -10,8 +10,8 @@
 #' for performing linear regression in order to predict/regress the
 #' corresponding differential gene expression data.
 #'
-#' @inheritParams wrapper_mpgex
-#' @param X The binomial distributed observations. A list containing two lists
+#' @inheritParams mpgex_regress
+#' @param x The binomial distributed observations. A list containing two lists
 #'  for control and treatment samples. Each of the two lists has a nested list
 #'  where each element is an L x 3 dimensional matrix.
 #' @param lambda Regularization term when performing Basis Linear Model fitting
@@ -23,24 +23,24 @@
 #'
 #' @examples
 #' obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
-#' Y   <- list(control = gex_control_data, treatment = gex_treatment_data)
+#' y   <- list(control = gex_control_data, treatment = gex_treatment_data)
 #' basis <- rbf.object(M = 5, gamma = 0.3)
-#' out   <- differential_mpgex(X = obs, Y = Y, basis = basis, lambda = 1e-02)
+#' out   <- differential_mpgex(x = obs, y = y, basis = basis, lambda = 1e-02)
 #'
 #' @export
-differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
+differential_mpgex <- function(formula = NULL, x, y, train_ind = NULL,
                          basis = NULL, w = NULL, train_perc = 0.7,
                          opt_method = "CG", opt_itnmax = 100, lambda = 0){
 
   # Optimize the BPR function for control samples
-  out_contr_opt <- bpr_optim(x      = X$control,
+  out_contr_opt <- bpr_optim(x      = x$control,
                              w      = w,
                              basis  = basis,
                              opt_method = opt_method,
                              opt_itnmax = opt_itnmax)
 
   # Optimize the BPR function for treatment samples
-  out_treat_opt <- bpr_optim(x       = X$treatment,
+  out_treat_opt <- bpr_optim(x       = x$treatment,
                              w       = out_contr_opt$w,
                              basis   = out_contr_opt$basis,
                              opt_method  = opt_method,
@@ -52,11 +52,11 @@ differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                                  diff_basis = out_contr_opt$basis,
                                  lambda     = lambda)
 
-  diff_expr <- (Y$control + 1e-01) / (Y$treatment + 1e-01)
+  diff_expr <- (y$control + 1e-01) / (y$treatment + 1e-01)
 
   # Create training and test sets
-  dataset <- partition_data(X = out_diff_meth$W_opt,
-                            Y = diff_expr,
+  dataset <- partition_data(x = out_diff_meth$W_opt,
+                            y = diff_expr,
                             train_ind  = train_ind,
                             train_perc = train_perc)
 
