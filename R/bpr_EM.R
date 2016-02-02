@@ -12,43 +12,28 @@
 #' @param pi_k Vector of length K, denoting the mixing proportions.
 #' @param w A MxK matrix, where each column contains the basis function
 #' coefficients for the corresponding cluster.
+#' @param basis A 'basis' object. E.g. see \code{\link{polynomial.object}}
 #' @param em_max_iter Integer denoting the maximum number of EM iterations.
 #' @param epsilon_conv Numeric denoting the convergence parameter for EM.
+#' @param opt_method The optimization method to be used. See
+#'  \code{\link[stats]{optim}} for possible methods. Default is 'CG'.
+#' @param opt_itnmax Optional argument giving the maximum number of iterations
+#'  for the corresponding method. See \code{\link[stats]{optim}} for details.
 #' @param is_verbose Logical, print results during EM iterations
-#' @inheritParams bpr_optim.matrix
-#'
-#' @examples
-#' ex_data <- bpr_data
-#' out_opt <- bpr_EM(x = ex_data, em_max_iter = 10, opt_itnmax = 10)
 #'
 #' @export
 bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                    em_max_iter = 100, epsilon_conv = 1e-05, opt_method = "CG",
                                         opt_itnmax = 100, is_verbose = FALSE){
-  # Check that x is a list object
-  assertthat::assert_that(is.list(x))
 
   # Extract number of observations
   N <- length(x)
-  assertthat::assert_that(N > 0)
 
   # Store weighted PDFs
   weighted_pdf <- matrix(0, nrow = N, ncol = K)
 
   # Initialize and store NLL for each EM iteration
   NLL <- c(1e+40)
-
-  # Perform checks for initial parameter values
-  out <- do_EM_checks(x = x,
-                      K = K,
-                      pi_k = pi_k,
-                      w = w,
-                      basis = basis,
-                      opt_method = opt_method,
-                      opt_itnmax = opt_itnmax)
-  w   <- out$w
-  basis <- out$basis
-  pi_k <- out$pi_k
 
   # Create design matrix for each observation
   des_mat <- lapply(X   = x,
@@ -106,7 +91,7 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     }
 
     if (is_verbose){
-      cat("It:\t",t, "\tNLL:\t", NLL[t+1],
+      cat("It:\t",t, "\tNLL:\t", NLL[t + 1],
               "\tNLL_diff:\t", NLL[t] - NLL[t + 1], "\n")
     }
 
@@ -125,78 +110,13 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     warning("EM did not converge with the given maximum iterations!\n")
   }
 
-  # Add names to the estimated parameters for clarity
-  names(pi_k) <- paste0("clust", 1:K)
-  colnames(w) <- paste0("clust", 1:K)
-
-  # Get hard cluster assignments for each observation
-  clust_assign <- apply(X = post_prob,
-                        MARGIN = 1,
-                        FUN = function(x) which(x == max(x, na.rm = TRUE)))
-
-  # Perform model selection
-  total_params <- (K - 1) + K * NROW(w)
-
-  # Bayesian Information Criterion
-  BIC <- 2 * NLL + total_params * log(N)
-
-  # Akaike Iformation Criterion
-  AIC <- 2 * NLL + 2 * total_params
-
-  # Integrated Complete Likelihood criterion
-  entropy <- (-1) * sum(post_prob * log(post_prob), na.rm = TRUE)
-  ICL <- BIC + entropy
-
   obj <- structure(list(K = K,
                         N = N,
                         w = w,
                         pi_k = pi_k,
-                        basis = basis,
-                        post_prob = post_prob,
-                        clust_assign = clust_assign,
                         NLL = NLL,
-                        BIC = BIC,
-                        AIC = AIC,
-                        ICL = ICL),
-                   class = "mpgex_EM")
+                        basis = basis,
+                        post_prob = post_prob),
+                   class = "bpr_EM")
   return(obj)
-}
-
-
-# Internal function to make all the appropriate type checks.
-do_EM_checks <- function(x, K = 2, pi_k = NULL,  w = NULL, basis = NULL,
-                                        opt_method = "CG", opt_itnmax = 100){
-  if (is.null(basis)){
-    basis <- polynomial.object()
-  }
-  if (is.null(w)){
-    w <- rep(0.2, basis$M + 1)
-
-    # Optimize the BPR function for each element in x
-    out_opt <- bpr_optim(x           = x,
-                         w           = w,
-                         basis       = basis,
-                         method      = opt_method,
-                         itnmax      = opt_itnmax)
-
-    # Keep only the optimized coefficients
-    W_opt <- out_opt$W_opt
-
-    # Use Kmeans with random starts
-    cl <- kmeans(W_opt, K, nstart = 25)
-    # Get the mixture components
-    C_n <- cl$cluster
-    # Mean for each cluster
-    w <- t(cl$centers)
-
-    # Mixing proportions
-    if (is.null(pi_k)){
-      N <- length(x)
-      pi_k <- as.vector(table(C_n) / N)
-    }
-  }
-  if (NROW(w) != (basis$M + 1) ){
-    stop("Coefficients vector should be M+1, M: number of basis functions!")
-  }
-  return(list(w = w, basis = basis, pi_k = pi_k))
 }
