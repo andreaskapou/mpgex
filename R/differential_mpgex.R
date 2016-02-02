@@ -30,21 +30,21 @@
 #' @export
 differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
                          basis = NULL, w = NULL, train_perc = 0.7,
-                         method = "CG", itnmax = 100, lambda = 0){
+                         opt_method = "CG", opt_itnmax = 100, lambda = 0){
 
   # Optimize the BPR function for control samples
   out_contr_opt <- bpr_optim(x      = X$control,
                              w      = w,
                              basis  = basis,
-                             method = method,
-                             itnmax = itnmax)
+                             opt_method = opt_method,
+                             opt_itnmax = opt_itnmax)
 
   # Optimize the BPR function for treatment samples
   out_treat_opt <- bpr_optim(x       = X$treatment,
                              w       = out_contr_opt$w,
                              basis   = out_contr_opt$basis,
-                             method  = method,
-                             itnmax  = itnmax)
+                             opt_method  = opt_method,
+                             opt_itnmax  = opt_itnmax)
 
 
   out_diff_meth <- fit_diff_meth(control    = out_contr_opt,
@@ -70,8 +70,8 @@ differential_mpgex <- function(formula = NULL, X, Y, train_ind = NULL,
   mpgex$diff_basis  <- out_diff_meth$diff_basis
   mpgex$W_opt       <- out_diff_meth$W_opt
   mpgex$diff_meth   <- out_diff_meth$diff_meth
-  mpgex$method <- method
-  mpgex$itnmax <- itnmax
+  mpgex$opt_method  <- opt_method
+  mpgex$opt_itnmax  <- opt_itnmax
   mpgex$train  <- dataset$train
   mpgex$test   <- dataset$test
   mpgex$contr_opt <- out_contr_opt

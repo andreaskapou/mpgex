@@ -125,7 +125,7 @@ calculate_errors <- function(x, y, summary = FALSE){
   # relative standard deviation
   R$rstd <- R$rmse / mean(x)
   rstd_f <- formatC(R$rstd, digits = 4, format = "f")
-  # r-squared
+  # Compute r-squared
   R$rsq  <- 1 - (sum(error ^ 2) / sum((x - mean(x)) ^ 2))
   rsq_f  <- formatC(R$rsq, digits = 4, format = "f")
   # Pearson Correlation Coefficient

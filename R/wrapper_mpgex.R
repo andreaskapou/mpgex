@@ -23,10 +23,10 @@
 #'  dataset to be used for training set, the remaining will be the test set.
 #' @param fit_feature Additional feature on how well the profile fits the
 #'  methylation data.
-#' @param method Parameter for defining the method to be used in the
+#' @param opt_method Parameter for defining the method to be used in the
 #'  optimization procedure, see \code{\link[stats]{optim}}.
-#' @param itnmax Optional parameter for defining the max number of iterations
-#'  of the optimization procedure, see \code{\link[stats]{optim}}.
+#' @param opt_itnmax Optional parameter for defining the max number of
+#'  iterations of the optimization procedure, see \code{\link[stats]{optim}}.
 #' @param is_summary Logical, print the summary statistics.
 #'
 #' @return An mpgex object consisting of the following elements: ...
@@ -44,16 +44,17 @@
 #' @export
 wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
                           train_ind = NULL, basis = NULL, w = NULL,
-                          train_perc = 0.7, fit_feature = NULL, method = "CG",
-                                              itnmax = 100, is_summary = TRUE){
+                          train_perc = 0.7, fit_feature = NULL,
+                          opt_method = "CG", opt_itnmax = 100,
+                                             is_summary = TRUE){
 
   # Optimize the BPR function for each element in x
   out_opt <- bpr_optim(x           = X,
                        w           = w,
                        basis       = basis,
                        fit_feature = fit_feature,
-                       method      = method,
-                       itnmax      = itnmax)
+                       opt_method  = opt_method,
+                       opt_itnmax  = opt_itnmax)
 
   # Create training and test sets
   dataset <- partition_data(X          = out_opt$W_opt,
@@ -84,8 +85,8 @@ wrapper_mpgex <- function(formula = NULL, X, Y, model_name = "lm",
   mpgex$Mus    <- out_opt$Mus
   mpgex$train  <- dataset$train
   mpgex$test   <- dataset$test
-  mpgex$method <- method
-  mpgex$itnmax <- itnmax
+  mpgex$opt_method <- opt_method
+  mpgex$opt_itnmax <- opt_itnmax
 
   class(mpgex) <- "mpgex"
 
