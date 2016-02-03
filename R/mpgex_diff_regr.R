@@ -27,7 +27,7 @@
 #' @examples
 #' obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
 #' y   <- list(control = gex_control_data, treatment = gex_treatment_data)
-#' basis <- rbf.object(M = 5, gamma = 0.3)
+#' basis <- rbf.object(M = 3, gamma = 0.5)
 #' out   <- mpgex_diff_regr(x = obs, y = y, basis = basis, lambda = 1e-02)
 #'
 #' @export
