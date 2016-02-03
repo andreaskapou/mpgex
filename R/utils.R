@@ -58,23 +58,21 @@ minmax_scaling <- function(data, xmin = NULL, xmax = NULL, fmin = 0, fmax = 1){
 #'
 #' @export
 partition_data <- function(x, y, train_ind = NULL, train_perc = 0.7){
+
+  # Convert both x and y to matrices
+  x <- as.matrix(x)
+  y <- as.matrix(y)
+
   if (is.null(train_ind)){
     pivot <- NROW(x) * train_perc
     train_ind <- sample(NROW(x), round(pivot))
   }
 
-  # TODO: Check when there is only one train or test point
-  if (is.matrix(x)){
-    train <- data.frame(x = x[train_ind, ],
-                        y = as.matrix(y[train_ind]))
-    test  <- data.frame(x = x[-train_ind, ],
-                        y = as.matrix(y[-train_ind]))
-  }else{
-    train <- data.frame(x = x[train_ind],
-                        y = as.matrix(y[train_ind]))
-    test  <- data.frame(x = x[-train_ind],
-                        y = as.matrix(y[-train_ind]))
-  }
+  train <- data.frame(x = x[train_ind, , drop = FALSE],
+                      y = y[train_ind, , drop = FALSE])
+
+  test <- data.frame(x = x[-train_ind, , drop = FALSE],
+                     y = y[-train_ind, , drop = FALSE])
   return(list(train = train, test = test, train_ind = train_ind))
 }
 
@@ -105,6 +103,7 @@ partition_data <- function(x, y, train_ind = NULL, train_perc = 0.7){
 #'
 #' @export
 calculate_errors <- function(x, y, summary = FALSE){
+  # TODO Compute actual errors using the right DoF!!
   R <- list()
   if (! is.numeric(x) || ! is.numeric(y))
     stop("Arguments 'x' and 'y' must be numeric vectors.")

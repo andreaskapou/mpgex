@@ -18,27 +18,21 @@
 #'
 #' @export
 predict_model_gex <- function(model, test, is_summary = TRUE){
+  # Convert to a data.frame
+  test <- as.data.frame(test)
 
-  regressors <- 1:(NCOL(test) - 1)
-  if (! NCOL(test) == 2){
-    test_pred <- predict(object  = model,
-                         newdata = test[ ,regressors],
-                         type = "response")
-  }else{
-    test_pred <- predict(object  = model,
-                         newdata = data.frame(x = test[ ,regressors]),
-                         type = "response")
-  }
+  # Make predictions
+  test_pred <- predict(object  = model,
+                       newdata = test[ , 1:(NCOL(test) - 1), drop = FALSE],
+                       type    = "response")
 
   # Calculate model errors
-  if (is_summary){
-    message("-- Test Errors --")
-  }
-  test_errors  <- calculate_errors(x = test$y,
-                                   y = test_pred,
-                                   summary = is_summary)
+  if (is_summary) message("-- Test Errors --")
+  test_errors <- calculate_errors(x = test$y,
+                                  y = test_pred,
+                                  summary = is_summary)
 
-  out <- list(test_pred    = test_pred,
-              test_errors  = test_errors)
+  out <- list(test_pred   = test_pred,
+              test_errors = test_errors)
   return(out)
 }

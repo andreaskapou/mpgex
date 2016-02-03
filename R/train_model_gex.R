@@ -21,7 +21,7 @@
 #' @seealso \code{\link{calculate_errors}}, \code{\link{predict_model_gex}}
 #'
 #' @export
-train_model_gex <- function(formula = NULL, model_name = "lm", train,
+train_model_gex <- function(formula = NULL, model_name = "svm", train,
                                                     is_summary = TRUE){
   if (is.null(formula)){
     formula <- y ~ .
@@ -45,13 +45,12 @@ train_model_gex <- function(formula = NULL, model_name = "lm", train,
                 data = train)
   }
 
+  # Make predictions
   train_pred <- predict(object = model,
-                        type = "response")
+                        type   = "response")
 
   # Calculate model errors
-  if (is_summary){
-    message("-- Train Errors --")
-  }
+  if (is_summary) message("-- Train Errors --")
   train_errors <- calculate_errors(x = train$y,
                                    y = train_pred,
                                    summary = is_summary)
