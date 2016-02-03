@@ -65,8 +65,14 @@ bpr_optim.default <- function(x, ...){
 #' @export
 bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
                                     opt_method = "CG", opt_itnmax = 100, ...){
+  # Check that x is a list object
+  assertthat::assert_that(is.list(x))
+
+  # Extract number of observations
   N <- length(x)
   assertthat::assert_that(N > 0)
+
+  # Perform checks for initial parameter values
   out <- do_checks(w = w, basis = basis)
   w   <- out$w
   basis <- out$basis
@@ -77,6 +83,8 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   }else{
     num_features <- length(w) + 1
   }
+
+  # Matrix for storing optimized coefficients
   W_opt <- matrix(NA_real_, nrow = N, ncol = num_features)
   colnames(W_opt) <- paste("w", seq(1, num_features), sep = "")
 
@@ -86,7 +94,10 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
     Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
     colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
   }
+
+  # Matrix for storing extrema promoter values
   x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
+
   # Perform optimization for each element of x, i.e. for each region i.
   for (i in 1:N){
     out_opt <- bpr_optim.matrix(x           = x[[i]],
@@ -151,12 +162,16 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' @export
 bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
                                      opt_method = "CG", opt_itnmax = 100, ...){
+  # Vector for storing CpG locations relative to TSS
   obs <- as.vector(x[ ,1])
+
+  # Methylation data
   data <- x[ ,2:3]
+
   # Create design matrix H
   des_mat <- design_matrix(x = basis, obs = obs)
-  H <- des_mat$H
-  basis <- des_mat$basis
+  H       <- des_mat$H
+  basis   <- des_mat$basis
 
   # Call optim function to perform minimization of the NLL of BPR function
   w_opt <- optim(par     = w,
