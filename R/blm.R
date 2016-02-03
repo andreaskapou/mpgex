@@ -40,7 +40,7 @@ blm <- function(x, y, basis, lambda = 0, return.all = TRUE){
     est$coefficients <- solve.qr(qx, y)
   }else{
     I <- diag(1, NCOL(H))  # Identity matrix
-    I[1,1]  <- 0  # Do not change the intercept coefficient
+    I[1,1]  <- 1e-10  # Do not change the intercept coefficient
     # Compute QR decomposition
     qx <- qr(lambda * I + t(H) %*% H)
     # Compute (lambda * I + H'H)^(-1)H'y
@@ -53,7 +53,7 @@ blm <- function(x, y, basis, lambda = 0, return.all = TRUE){
     # Residuals
     est$residuals <- y - est$fitted.values
     # Degrees of freedom
-    est$df.residuals <- NROW(x) - NCOL(x)
+    est$df.residuals <- NROW(H) - NCOL(H)
     # Standard deviation of residuals
     est$sigma <- sqrt(sum(est$residuals ^ 2) / est$df.residuals)
     # Compute sigma^2 * (x'x)^(-1)
