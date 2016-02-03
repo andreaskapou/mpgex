@@ -118,9 +118,11 @@ eval_function.rbf <- function(x, obs, w, ...){
   obs <- as.matrix(obs)
   if (x$M > 0){
     for (i in 1:x$M){
-      f <- f + w[i + 1] * apply(obs, 1, rbf_basis,
-                                mus = x$mus[i],
-                                gamma = x$gamma)
+      f <- f + w[i + 1] * apply(X      = obs,
+                                MARGIN = 1,
+                                FUN    = rbf_basis,
+                                mus    = x$mus[i],
+                                gamma  = x$gamma)
     }
   }
   return(f)
