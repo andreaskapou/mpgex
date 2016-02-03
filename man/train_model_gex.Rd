@@ -4,7 +4,7 @@
 \alias{train_model_gex}
 \title{Train model for gene expression data from methylation profiles}
 \usage{
-train_model_gex(formula = NULL, model_name = "lm", train,
+train_model_gex(formula = NULL, model_name = "svm", train,
   is_summary = TRUE)
 }
 \arguments{
