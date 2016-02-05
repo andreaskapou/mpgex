@@ -16,6 +16,8 @@
 #' @param y The gene expression data. A list containing two vectors for control
 #' and treatment samples.
 #' @param lambda Regularization term when performing Basis Linear Model fitting
+#' @param x_evals Integer denoting the number of evaluation points when
+#'  learning the differential methylation profiles.
 #' @inheritParams mpgex_regr
 #'
 #' @return An mpgex object consisting of the following elements:
@@ -34,9 +36,11 @@
 mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                             basis = NULL, train_ind = NULL, train_perc = 0.7,
                             fit_feature = NULL, opt_method = "CG",
-                            opt_itnmax = 100, lambda = 0, is_summary = TRUE){
+                            opt_itnmax = 100, lambda = 0, x_evals = 50,
+                                                        is_summary = TRUE){
 
   # Learn methylation profiles for control samples
+  message("Learning control methylation profiles ...\n")
   out_contr_opt <- bpr_optim(x           = x$control,
                              w           = w,
                              basis       = basis,
@@ -45,6 +49,7 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                              opt_itnmax  = opt_itnmax)
 
   # Learn methylation profiles for treatment samples
+  message("Learning treatment methylation profiles ...\n")
   out_treat_opt <- bpr_optim(x           = x$treatment,
                              w           = out_contr_opt$w,
                              basis       = out_contr_opt$basis,
@@ -53,32 +58,38 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                              opt_itnmax  = opt_itnmax)
 
   # Learn differential methylation profile from control and treatment samples
+  message("Learning differential methylation profiles ...\n")
   out_diff_meth <- learn_diff_meth(control     = out_contr_opt,
                                    treatment   = out_treat_opt,
                                    diff_basis  = out_contr_opt$basis,
                                    fit_feature = fit_feature,
-                                   lambda      = lambda)
+                                   lambda      = lambda,
+                                   x_evals     = x_evals)
 
   # TODO: Should this be division or subtraction or something more complicated
   # Compute differential gene expression
   diff_expr <- (y$control + 1e-02) / (y$treatment + 1e-02)
 
   # Create training and test sets
+  message("Partitioning to test and train data ...\n")
   dataset <- partition_data(x          = out_diff_meth$W_opt,
                             y          = diff_expr,
                             train_ind  = train_ind,
                             train_perc = train_perc)
 
   # Train regression model from methylation profiles
+  message("Training linear regression model ...\n")
   train_model <- train_model_gex(formula    = formula,
                                  model_name = model_name,
                                  train      = dataset$train,
                                  is_summary = is_summary)
 
   # Predict gene expression from methylation profiles
+  message("Making predictions ...\n")
   predictions <- predict_model_gex(model      = train_model$gex_model,
                                    test       = dataset$test,
                                    is_summary = is_summary)
+  message("Done!\n\n")
 
   # Create 'mpgex_diff_regr' object
   obj <- structure(list(formula      = formula,
@@ -91,6 +102,8 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                         test_pred    = predictions$test_pred,
                         train_errors = train_model$train_errors,
                         test_errors  = predictions$test_errors,
+                        train        = dataset$train,
+                        test         = dataset$test,
                         basis        = out_contr_opt$basis,
                         W_opt        = out_diff_meth$W_opt,
                         Mus          = out_diff_meth$Mus),
