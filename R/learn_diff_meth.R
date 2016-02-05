@@ -75,7 +75,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
     diff_meth[i, ] <- y_contr - y_treat
 
     # Create the design matrix
-    des_mat <- design_matrix(x = basis, obs = xs_mat[i, ])
+    des_mat <- design_matrix(x = diff_basis, obs = xs_mat[i, ])
 
     # Create a data frame containing the regressors x and the target value y
     dataset <- data.frame(des_mat$H[, 2:NCOL(des_mat$H)], y = diff_meth[i, ])
