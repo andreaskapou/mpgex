@@ -41,6 +41,7 @@ bpr_likelihood <- function(w, H, data, is_NLL = FALSE){
   g <- as.vector(H %*% w)
   # Compute the cdf of N(0,1) distribution (i.e. probit function)
   Phi <- as.vector(pnorm(g))
+  Phi[which(Phi > (1 - 1e-5))] <- 1 - 1e-5
 
   # Compute the log likelihood
   res <- sum(dbinom(x = succ, size = total, prob = Phi, log = TRUE))
@@ -88,8 +89,11 @@ bpr_gradient <- function(w, H, data, is_NLL = FALSE){
   g <- as.vector(H %*% w)
   # Compute the cdf of N(0,1) distribution (i.e. probit function)
   Phi <- as.vector(pnorm(g))
+  Phi[which(Phi > (1 - 1e-5))] <- 1 - 1e-5
+
   # Compute the density of a N(0,1) distribution
   N <- as.vector(dnorm(g))
+  N[which(N < 1e-10)] <- 1e-10
 
   # Compute the gradient vector w.r.t the coefficients w
   if (NROW(H) == 1){
