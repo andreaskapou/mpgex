@@ -6,7 +6,8 @@
 \usage{
 mpgex_diff_regr(formula = NULL, x, y, model_name = "svm", w = NULL,
   basis = NULL, train_ind = NULL, train_perc = 0.7, fit_feature = NULL,
-  opt_method = "CG", opt_itnmax = 100, lambda = 0, is_summary = TRUE)
+  opt_method = "CG", opt_itnmax = 100, lambda = 0, x_evals = 50,
+  is_summary = TRUE)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -44,6 +45,9 @@ iterations of the optimization procedure, see \code{\link[stats]{optim}}.}
 
 \item{lambda}{Regularization term when performing Basis Linear Model fitting}
 
+\item{x_evals}{Integer denoting the number of evaluation points when
+learning the differential methylation profiles.}
+
 \item{is_summary}{Logical, print the summary statistics.}
 }
 \value{
@@ -63,7 +67,7 @@ corresponding differential gene expression data.
 \examples{
 obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
 y   <- list(control = gex_control_data, treatment = gex_treatment_data)
-basis <- rbf.object(M = 5, gamma = 0.3)
+basis <- rbf.object(M = 3, gamma = 0.5)
 out   <- mpgex_diff_regr(x = obs, y = y, basis = basis, lambda = 1e-02)
 
 }
