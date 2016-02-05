@@ -51,6 +51,7 @@ mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
   assertthat::assert_that(is.list(x))
 
   # Learn methylation profiles for each gene promoter region
+  message("Learning methylation profiles ...\n")
   out_opt <- bpr_optim(x           = x,
                        w           = w,
                        basis       = basis,
@@ -59,21 +60,25 @@ mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        opt_itnmax  = opt_itnmax)
 
   # Create training and test sets
+  message("Partitioning to test and train data ...\n")
   dataset <- partition_data(x          = out_opt$W_opt,
                             y          = y,
                             train_ind  = train_ind,
                             train_perc = train_perc)
 
   # Train regression model from methylation profiles
+  message("Training linear regression model ...\n")
   train_model <- train_model_gex(formula    = formula,
                                  model_name = model_name,
                                  train      = dataset$train,
                                  is_summary = is_summary)
 
   # Predict gene expression from methylation profiles
+  message("Making predictions ...\n")
   predictions <- predict_model_gex(model      = train_model$gex_model,
                                    test       = dataset$test,
                                    is_summary = is_summary)
+  message("Done!\n\n")
 
   # Create 'mpgex_regr' object
   obj <- structure(list(formula      = formula,
@@ -86,6 +91,8 @@ mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                         test_pred    = predictions$test_pred,
                         train_errors = train_model$train_errors,
                         test_errors  = predictions$test_errors,
+                        train        = dataset$train,
+                        test         = dataset$test,
                         basis        = out_opt$basis,
                         W_opt        = out_opt$W_opt,
                         Mus          = out_opt$Mus),
