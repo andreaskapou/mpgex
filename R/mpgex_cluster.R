@@ -36,6 +36,8 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   basis <- out$basis
   pi_k <- out$pi_k
 
+  # Apply EM algorithm to cluster similar methylation profiles
+  message("Clustering methylation profiles via EM ...\n")
   mpgex <- bpr_EM(x = x,
                   K = K,
                   pi_k = pi_k,
@@ -46,6 +48,7 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                   opt_method = opt_method,
                   opt_itnmax = opt_itnmax,
                   is_verbose = is_verbose)
+  message("Done!\n\n")
 
   # Add names to the estimated parameters for clarity
   names(mpgex$pi_k) <- paste0("clust", 1:K)
