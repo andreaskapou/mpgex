@@ -41,10 +41,15 @@ bpr_likelihood <- function(w, H, data, is_NLL = FALSE){
   g <- as.vector(H %*% w)
   # Compute the cdf of N(0,1) distribution (i.e. probit function)
   Phi <- as.vector(pnorm(g))
-  Phi[which(Phi > (1 - 1e-5))] <- 1 - 1e-5
+
+  # In extreme cases where probit is 0 or 1, subtract a tiny number
+  # so we can evaluate the log(0) when computing the Binomial
+  Phi[which(Phi > (1 - 1e-289))] <- 1 - 1e-289
+  Phi[which(Phi < 1e-289)] <- 1e-289
 
   # Compute the log likelihood
-  res <- sum(dbinom(x = succ, size = total, prob = Phi, log = TRUE))
+  res <- sum(dbinom(x = succ, size = total, prob = Phi, log = TRUE)) -
+                                                        1/2 * t(w) %*% w
 
   # If we required the Negative Log Likelihood
   if (is_NLL){
@@ -89,18 +94,22 @@ bpr_gradient <- function(w, H, data, is_NLL = FALSE){
   g <- as.vector(H %*% w)
   # Compute the cdf of N(0,1) distribution (i.e. probit function)
   Phi <- as.vector(pnorm(g))
-  Phi[which(Phi > (1 - 1e-5))] <- 1 - 1e-5
+
+  # In extreme cases where probit is 0 or 1, subtract a tiny number
+  # so we can evaluate the log(0) when computing the Binomial
+  Phi[which(Phi > (1 - 1e-289))] <- 1 - 1e-289
+  Phi[which(Phi < 1e-289)] <- 1e-289
 
   # Compute the density of a N(0,1) distribution
   N <- as.vector(dnorm(g))
-  N[which(N < 1e-10)] <- 1e-10
+  N[which(N < 1e-289)] <- 1e-289
 
   # Compute the gradient vector w.r.t the coefficients w
   if (NROW(H) == 1){
     gr <- (succ * (1 / Phi) - (total - succ) * (1 / (1 - Phi))) * N %*% H
   }else{
     gr <- (t(succ) %*% diag(1 / Phi) - t(total - succ) %*%
-             diag(1 / (1 - Phi))) %*% diag(N) %*% H
+             diag(1 / (1 - Phi))) %*% diag(N) %*% H - w
   }
 
   # If we required the Negative Log Likelihood
