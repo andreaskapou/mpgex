@@ -5,7 +5,8 @@
 \title{Optimization method for the BPR NLL function using list x}
 \usage{
 \method{bpr_optim}{list}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  opt_method = "CG", opt_itnmax = 100, ...)
+  opt_method = "CG", opt_itnmax = 100, is_parallel = TRUE,
+  no_cores = NULL, ...)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -25,6 +26,10 @@ methylation data.}
 
 \item{opt_itnmax}{Optional argument giving the maximum number of iterations
 for the corresponding method. See \code{\link[stats]{optim}} for details.}
+
+\item{is_parallel}{Logical, indicating if code should be run in parallel.}
+
+\item{no_cores}{Number of cores to be used, default is max_no_cores - 1.}
 
 \item{...}{Additional parameters}
 }
@@ -55,7 +60,8 @@ to process each element of the list.
 }
 \examples{
 ex_data <- bpr_data
-out_opt <- bpr_optim(x = ex_data, opt_method = "CG")
+basis <- rbf.object(M=3)
+out_opt <- bpr_optim(x = ex_data, basis = basis, opt_method = "CG")
 
 }
 \seealso{
