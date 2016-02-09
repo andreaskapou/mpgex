@@ -124,12 +124,11 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
       no_cores <- parallel::detectCores() - 1
     }
     if (is.na(no_cores)){
-      doParallel::registerDoParallel()
-    }else{
-      # Create cluster object
-      cl <- parallel::makeCluster(no_cores)
-      doParallel::registerDoParallel(cl)
+      no_cores <- 2
     }
+    # Create cluster object
+    cl <- parallel::makeCluster(no_cores)
+    doParallel::registerDoParallel(cl)
 
     # Parallel optimization for each element of x, i.e. for each region i.
     res <- foreach::"%dopar%"(obj = foreach::foreach(i = 1:N),
@@ -141,15 +140,12 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
                                   opt_method  = opt_method,
                                   opt_itnmax  = opt_itnmax)
                               })
-    if (!is.na(no_cores)){
-      # Stop parallel execution
-      parallel::stopCluster(cl)
-    }
+    # Stop parallel execution
+    parallel::stopCluster(cl)
   }else{
     # Sequential optimization for each element of x, i.e. for each region i.
     res <- foreach::"%do%"(obj = foreach::foreach(i = 1:N),
                            ex  = {
-                             print(i)
       out_opt <- bpr_optim.matrix(x           = x[[i]],
                                   w           = w,
                                   basis       = basis,
