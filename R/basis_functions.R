@@ -36,7 +36,7 @@ polynomial.object <- function(M = 1){
 #' @param gamma Inverse width of radial basis function.
 #' @param mus Optional centers of RBF function.
 #' @param eq_spaced_mus Logical, if TRUE, equally spaced centers are created,
-#'  otherwise centers are created using \code{\link[stats]{kmeans}} algorithm
+#'  otherwise centers are created using \code{\link[stats]{kmeans}} algorithm.
 #' @param whole_region Logical, indicating if the centers will be evaluated
 #'  equally spaced on the whole region, or between the min and max of the
 #'  observation values.
@@ -50,15 +50,17 @@ polynomial.object <- function(M = 1){
 #' (obj)
 #'
 #' @export
-rbf.object <- function(M = 2, gamma = 1, mus = NULL, eq_spaced_mus = TRUE,
-                                                      whole_region = FALSE){
+rbf.object <- function(M = 2, gamma = NULL, mus = NULL, eq_spaced_mus = TRUE,
+                                                      whole_region = TRUE){
   assertthat::assert_that(is.numeric(M))
-  assertthat::assert_that(is.numeric(gamma))
   assertthat::assert_that(is.logical(eq_spaced_mus))
   assertthat::assert_that(is.logical(whole_region))
   assertthat::assert_that(M %% 1 == 0)
   assertthat::assert_that(M > -1)
-  assertthat::assert_that(gamma > 0)
+  if (! is.null(gamma)){
+    assertthat::assert_that(is.numeric(gamma))
+    assertthat::assert_that(gamma > 0)
+  }
   if (! is.null(mus)){
     assertthat::assert_that(is.vector(mus))
     assertthat::assert_that(M == length(mus))
@@ -112,7 +114,7 @@ polynomial_basis <- function(X, M = 1){
 #' @seealso \code{\link{polynomial_basis}}
 #'
 #' @examples
-#' out <- rbf_basis(X = c(1,2), mus = c(1,1))
+#' out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 1)
 #' #
 #' out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 0.1)
 #'
