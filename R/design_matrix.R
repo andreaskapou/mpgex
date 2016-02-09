@@ -93,9 +93,9 @@ design_matrix.rbf <- function(x, obs, ...){
   assertthat::assert_that(is.vector(obs))
 
   N   <- length(obs)  # Length of the dataset
-  if (x$M > N - 1){
-    stop("Number of basis functions should be less than observations!")
-  }
+  #if (x$M > N - 1){
+  #  stop("Number of basis functions should be less than observations!")
+  #}
   if (x$M == 0){
     H <- matrix(1, nrow = N, ncol = 1)
     x$mus <- 0
@@ -124,6 +124,7 @@ design_matrix.rbf <- function(x, obs, ...){
         x$mus <- km$centers  # RBF centers
       }
     }
+    # TODO: Do this better!!!!
     if (is.null(x$gamma)){
       if (x$whole_region){
         x$gamma <- x$M^2 / (abs(1) + abs(-1)) ^ 2
