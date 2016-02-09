@@ -99,14 +99,20 @@ design_matrix.rbf <- function(x, obs, ...){
   if (x$M == 0){
     H <- matrix(1, nrow = N, ncol = 1)
     x$mus <- 0
+    x$gamma <- 1
   }else{
     if (is.null(x$mus)){
       if (x$eq_spaced_mus){
+        x$mus <- vector(mode = "numeric", x$M)
         if (x$whole_region){
           # TODO: Should this be deleted or get in another way the min, max?
-          x$mus <- seq(-1, 1, length.out = x$M)
+          for (i in 1:x$M){
+            x$mus[i] <- i * (1 - (-1)) / (x$M + 1) + (-1)
+          }
         }else{
-          x$mus <- seq(min(obs), max(obs), length.out = x$M)
+          for (i in 1:x$M){
+            x$mus[i] <- i * (max(obs) - min(obs)) / (x$M + 1) + min(obs)
+          }
         }
       }else{
         repeat{
@@ -116,6 +122,13 @@ design_matrix.rbf <- function(x, obs, ...){
           }
         }
         x$mus <- km$centers  # RBF centers
+      }
+    }
+    if (is.null(x$gamma)){
+      if (x$whole_region){
+        x$gamma <- x$M^2 / (abs(1) + abs(-1)) ^ 2
+      }else{
+        x$gamma <- x$M^2 / (abs(max(obs)) + abs(min(obs))) ^ 2
       }
     }
     # Convert the 'obs' vector to an N x 1 dimensional matrix
