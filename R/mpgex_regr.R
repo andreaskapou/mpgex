@@ -27,6 +27,8 @@
 #'  optimization procedure, see \code{\link[stats]{optim}}.
 #' @param opt_itnmax Optional parameter for defining the max number of
 #'  iterations of the optimization procedure, see \code{\link[stats]{optim}}.
+#' @param is_parallel Logical, indicating if code should be run in parallel.
+#' @param no_cores Number of cores to be used, default is max_no_cores - 1.
 #' @param is_summary Logical, print the summary statistics.
 #'
 #' @return An mpgex object consisting of the following elements:
@@ -45,7 +47,7 @@
 mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        basis = NULL, train_ind = NULL, train_perc = 0.7,
                        fit_feature = NULL, opt_method = "CG", opt_itnmax = 100,
-                                                            is_summary = TRUE){
+                       is_parallel = TRUE, no_cores = NULL, is_summary = TRUE){
 
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
@@ -57,7 +59,9 @@ mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        basis       = basis,
                        fit_feature = fit_feature,
                        opt_method  = opt_method,
-                       opt_itnmax  = opt_itnmax)
+                       opt_itnmax  = opt_itnmax,
+                       is_parallel = is_parallel,
+                       no_cores    = no_cores)
 
   # Create training and test sets
   message("Partitioning to test and train data ...\n")
