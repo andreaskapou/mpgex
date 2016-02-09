@@ -60,6 +60,8 @@ rbf.object <- function(M = 2, gamma = NULL, mus = NULL, eq_spaced_mus = TRUE,
   if (! is.null(gamma)){
     assertthat::assert_that(is.numeric(gamma))
     assertthat::assert_that(gamma > 0)
+  }else{
+    gamma <- M^2 / (abs(1) + abs(-1)) ^ 2
   }
   if (! is.null(mus)){
     assertthat::assert_that(is.vector(mus))
