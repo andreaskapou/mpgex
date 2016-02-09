@@ -37,6 +37,8 @@ bpr_optim.default <- function(x, ...){
 #'  matrix of observations, where 1st column contains the locations. The 2nd
 #'  and 3rd columns contain the total trials and number of successes at the
 #'  corresponding locations, repsectively.
+#' @param is_parallel Logical, indicating if code should be run in parallel.
+#' @param no_cores Number of cores to be used, default is max_no_cores - 1.
 #' @inheritParams bpr_optim.matrix
 #'
 #' @return A list containing the following elements:
@@ -60,11 +62,13 @@ bpr_optim.default <- function(x, ...){
 #'
 #' @examples
 #' ex_data <- bpr_data
-#' out_opt <- bpr_optim(x = ex_data, opt_method = "CG")
+#' basis <- rbf.object(M=3)
+#' out_opt <- bpr_optim(x = ex_data, basis = basis, opt_method = "CG")
 #'
 #' @export
 bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
-                                    opt_method = "CG", opt_itnmax = 100, ...){
+                           opt_method = "CG", opt_itnmax = 100,
+                           is_parallel = TRUE, no_cores = NULL, ...){
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
 
@@ -77,41 +81,108 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   w   <- out$w
   basis <- out$basis
 
-  # Data frame for storing all the coefficients for each element of list x
-  if (is.null(fit_feature)){
-    num_features <- length(w)
+#   # Data frame for storing all the coefficients for each element of list x
+#   if (is.null(fit_feature)){
+#     num_features <- length(w)
+#   }else{
+#     num_features <- length(w) + 1
+#   }
+#
+#   # Matrix for storing optimized coefficients
+#   W_opt <- matrix(NA_real_, nrow = N, ncol = num_features)
+#   colnames(W_opt) <- paste("w", seq(1, num_features), sep = "")
+#
+#   # Matrix for storing the centers of RBFs if object class is 'rbf'
+#   Mus <- NULL
+#   if (is(basis, "rbf")){
+#     Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
+#     colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
+#   }
+#
+#   # Matrix for storing extrema promoter values
+#   x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
+#
+#   for (i in 1:N){
+#     out_opt <- bpr_optim.matrix(x           = x[[i]],
+#                                 w           = w,
+#                                 basis       = basis,
+#                                 fit_feature = fit_feature,
+#                                 opt_method  = opt_method,
+#                                 opt_itnmax  = opt_itnmax)
+#     W_opt[i, ] <- out_opt$w_opt
+#     if (is(basis, "rbf")){
+#       Mus[i, ] <- out_opt$basis$mus
+#     }
+#     x_extrema[i, ] <- out_opt$x_extrema
+#   }
+
+
+  # If parallel mode is ON
+  if (is_parallel){
+    # If number of cores is not given
+    if (is.null(no_cores)){
+      no_cores <- parallel::detectCores() - 1
+    }
+    if (is.na(no_cores)){
+      doParallel::registerDoParallel()
+    }else{
+      # Create cluster object
+      cl <- parallel::makeCluster(no_cores)
+      doParallel::registerDoParallel(cl)
+    }
+
+    # Parallel optimization for each element of x, i.e. for each region i.
+    res <- foreach::"%dopar%"(obj = foreach::foreach(i = 1:N),
+                              ex  = {
+      out_opt <- bpr_optim.matrix(x           = x[[i]],
+                                  w           = w,
+                                  basis       = basis,
+                                  fit_feature = fit_feature,
+                                  opt_method  = opt_method,
+                                  opt_itnmax  = opt_itnmax)
+                              })
+    if (!is.na(no_cores)){
+      # Stop parallel execution
+      parallel::stopCluster(cl)
+    }
   }else{
-    num_features <- length(w) + 1
+    # Sequential optimization for each element of x, i.e. for each region i.
+    res <- foreach::"%do%"(obj = foreach::foreach(i = 1:N),
+                           ex  = {
+                             print(i)
+      out_opt <- bpr_optim.matrix(x           = x[[i]],
+                                  w           = w,
+                                  basis       = basis,
+                                  fit_feature = fit_feature,
+                                  opt_method  = opt_method,
+                                  opt_itnmax  = opt_itnmax)
+                          })
   }
 
   # Matrix for storing optimized coefficients
-  W_opt <- matrix(NA_real_, nrow = N, ncol = num_features)
-  colnames(W_opt) <- paste("w", seq(1, num_features), sep = "")
+  W_opt <- sapply(res, function(x) x$w_opt)
+  if (is.matrix(W_opt)){
+    W_opt <- t(W_opt)
+  }else{
+    W_opt <- as.matrix(W_opt)
+  }
+  colnames(W_opt) <- paste("w", seq(1, NCOL(W_opt)), sep = "")
 
   # Matrix for storing the centers of RBFs if object class is 'rbf'
   Mus <- NULL
   if (is(basis, "rbf")){
-    Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
-    colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
+    Mus <- sapply(lapply(res, function(x) x$basis), function(y) y$mus)
+    if (is.matrix(Mus)){
+      Mus <- t(Mus)
+    }else{
+      Mus <- as.matrix(Mus)
+    }
+    colnames(Mus) <- paste("mu", seq(1, NCOL(Mus)), sep = "")
   }
 
   # Matrix for storing extrema promoter values
-  x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
+  x_extrema <- t(sapply(res, function(x) x$x_extrema))
 
-  # Perform optimization for each element of x, i.e. for each region i.
-  for (i in 1:N){
-    out_opt <- bpr_optim.matrix(x           = x[[i]],
-                                w           = w,
-                                basis       = basis,
-                                fit_feature = fit_feature,
-                                opt_method  = opt_method,
-                                opt_itnmax  = opt_itnmax)
-    W_opt[i, ] <- out_opt$w_opt
-    if (is(basis, "rbf")){
-      Mus[i, ] <- out_opt$basis$mus
-    }
-    x_extrema[i, ] <- out_opt$x_extrema
-  }
   return(list(W_opt = W_opt,
               Mus = Mus,
               basis = basis,
@@ -211,7 +282,7 @@ do_checks <- function(w = NULL, basis = NULL){
     basis <- polynomial.object()
   }
   if (is.null(w)){
-    w <- rep(0.1, basis$M + 1)
+    w <- rep(0.5, basis$M + 1)
   }
   if (length(w) != (basis$M + 1) ){
     stop("Coefficients vector should be M+1, M: number of basis functions!")
