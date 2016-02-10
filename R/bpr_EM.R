@@ -19,12 +19,15 @@
 #'  \code{\link[stats]{optim}} for possible methods. Default is 'CG'.
 #' @param opt_itnmax Optional argument giving the maximum number of iterations
 #'  for the corresponding method. See \code{\link[stats]{optim}} for details.
+#' @param is_parallel Logical, indicating if code should be run in parallel.
+#' @param no_cores Number of cores to be used, default is max_no_cores - 1.
 #' @param is_verbose Logical, print results during EM iterations
 #'
 #' @export
 bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                    em_max_iter = 100, epsilon_conv = 1e-05, opt_method = "CG",
-                                        opt_itnmax = 100, is_verbose = FALSE){
+                   opt_itnmax = 100, is_parallel = TRUE, no_cores = NULL,
+                   is_verbose = FALSE){
 
   # Extract number of observations
   N <- length(x)
