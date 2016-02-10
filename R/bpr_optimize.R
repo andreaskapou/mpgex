@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' data <- bpr_data
-#' out_opt <- bpr_optim(x = data, method = "BFGS")
+#' out_opt <- bpr_optim(x = data, is_parallel = FALSE, method = "BFGS")
 #'
 #' @export
 bpr_optim <- function(x, ...){
@@ -63,7 +63,7 @@ bpr_optim.default <- function(x, ...){
 #' @examples
 #' ex_data <- bpr_data
 #' basis <- rbf.object(M=3)
-#' out_opt <- bpr_optim(x = ex_data, basis = basis, opt_method = "CG")
+#' out_opt <- bpr_optim(x = ex_data, is_parallel = FALSE, basis = basis, opt_method = "CG")
 #'
 #' @export
 bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
@@ -77,45 +77,12 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   assertthat::assert_that(N > 0)
 
   # Perform checks for initial parameter values
-  out <- do_checks(w = w, basis = basis)
+  out <- .do_checks(w = w, basis = basis)
   w   <- out$w
   basis <- out$basis
 
-#   # Data frame for storing all the coefficients for each element of list x
-#   if (is.null(fit_feature)){
-#     num_features <- length(w)
-#   }else{
-#     num_features <- length(w) + 1
-#   }
-#
-#   # Matrix for storing optimized coefficients
-#   W_opt <- matrix(NA_real_, nrow = N, ncol = num_features)
-#   colnames(W_opt) <- paste("w", seq(1, num_features), sep = "")
-#
-#   # Matrix for storing the centers of RBFs if object class is 'rbf'
-#   Mus <- NULL
-#   if (is(basis, "rbf")){
-#     Mus <- matrix(NA_real_, nrow = N, ncol = basis$M)
-#     colnames(Mus) <- paste("mu", seq(1, basis$M), sep = "")
-#   }
-#
-#   # Matrix for storing extrema promoter values
-#   x_extrema <- matrix(NA_real_, nrow = N, ncol = 2)
-#
-#   for (i in 1:N){
-#     out_opt <- bpr_optim.matrix(x           = x[[i]],
-#                                 w           = w,
-#                                 basis       = basis,
-#                                 fit_feature = fit_feature,
-#                                 opt_method  = opt_method,
-#                                 opt_itnmax  = opt_itnmax)
-#     W_opt[i, ] <- out_opt$w_opt
-#     if (is(basis, "rbf")){
-#       Mus[i, ] <- out_opt$basis$mus
-#     }
-#     x_extrema[i, ] <- out_opt$x_extrema
-#   }
-
+  # Initialize so the CMD check on R passes without NOTES
+  i <- 0
 
   # If parallel mode is ON
   if (is_parallel){
@@ -167,13 +134,15 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   # Matrix for storing the centers of RBFs if object class is 'rbf'
   Mus <- NULL
   if (is(basis, "rbf")){
-    Mus <- sapply(lapply(res, function(x) x$basis), function(y) y$mus)
-    if (is.matrix(Mus)){
-      Mus <- t(Mus)
-    }else{
-      Mus <- as.matrix(Mus)
+    if (is.null(basis$mus)){
+      Mus <- sapply(lapply(res, function(x) x$basis), function(y) y$mus)
+      if (is.matrix(Mus)){
+        Mus <- t(Mus)
+      }else{
+        Mus <- as.matrix(Mus)
+      }
+      colnames(Mus) <- paste("mu", seq(1, NCOL(Mus)), sep = "")
     }
-    colnames(Mus) <- paste("mu", seq(1, NCOL(Mus)), sep = "")
   }
 
   # Matrix for storing extrema promoter values
@@ -273,9 +242,9 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 
 
 # Internal function to make all the appropriate type checks.
-do_checks <- function(w = NULL, basis = NULL){
+.do_checks <- function(w = NULL, basis = NULL){
   if (is.null(basis)){
-    basis <- polynomial.object()
+    basis <- rbf.object(M = 3)
   }
   if (is.null(w)){
     w <- rep(0.5, basis$M + 1)
