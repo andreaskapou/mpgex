@@ -148,6 +148,7 @@ bpr_gradient <- function(w, H, data, is_NLL = FALSE){
 sum_weighted_bpr_lik <- function(w, x, des_mat, post_prob, is_NLL = TRUE){
   N <- length(x)
 
+  # TODO: Create tests
   # For each element in x, evaluate the BPR log likelihood
   res <- vapply(X   = 1:N,
                 FUN = function(y) bpr_likelihood(w = w,
@@ -179,6 +180,7 @@ sum_weighted_bpr_lik <- function(w, x, des_mat, post_prob, is_NLL = TRUE){
 sum_weighted_bpr_grad <- function(w, x, des_mat, post_prob, is_NLL = TRUE){
   N <- length(x)
 
+  # TODO: Create tests
   # For each element in x, evaluate the gradient of the BPR log likelihood
   res <- vapply(X   = 1:N,
                 FUN = function(y) bpr_gradient(w = w,
