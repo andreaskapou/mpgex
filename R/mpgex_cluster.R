@@ -10,12 +10,14 @@
 #'
 #' @examples
 #' ex_data <- bpr_data
-#' mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 10, opt_itnmax = 10)
+#' mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 5, is_parallel = FALSE,
+#'                              opt_itnmax = 10)
 #'
 #' @export
 mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                           em_max_iter = 100, epsilon_conv = 1e-05,
-                          opt_method = "CG", opt_itnmax = 100,
+                          opt_method = "CG", opt_itnmax = 500,
+                          is_parallel = TRUE, no_cores = NULL,
                                              is_verbose = FALSE){
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
@@ -25,13 +27,15 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   assertthat::assert_that(N > 0)
 
   # Perform checks for initial parameter values
-  out <- do_EM_checks(x = x,
-                      K = K,
-                      pi_k = pi_k,
-                      w = w,
-                      basis = basis,
-                      opt_method = opt_method,
-                      opt_itnmax = opt_itnmax)
+  out <- .do_EM_checks(x = x,
+                       K = K,
+                       pi_k = pi_k,
+                       w = w,
+                       basis = basis,
+                       opt_method = opt_method,
+                       opt_itnmax = opt_itnmax,
+                       is_parallel = is_parallel,
+                       no_cores    = no_cores)
   w   <- out$w
   basis <- out$basis
   pi_k <- out$pi_k
@@ -47,6 +51,8 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                   epsilon_conv = epsilon_conv,
                   opt_method = opt_method,
                   opt_itnmax = opt_itnmax,
+                  is_parallel = is_parallel,
+                  no_cores    = no_cores,
                   is_verbose = is_verbose)
   message("Done!\n\n")
 
@@ -81,20 +87,23 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
 
 
 # Internal function to make all the appropriate type checks.
-do_EM_checks <- function(x, K = 2, pi_k = NULL,  w = NULL, basis = NULL,
-                         opt_method = "CG", opt_itnmax = 100){
+.do_EM_checks <- function(x, K = 2, pi_k = NULL,  w = NULL, basis = NULL,
+                          opt_method = "CG", opt_itnmax = 100,
+                          is_parallel = TRUE, no_cores = NULL){
   if (is.null(basis)){
-    basis <- polynomial.object()
+    basis <- rbf.object(M = 3)
   }
   if (is.null(w)){
-    w <- rep(0.2, basis$M + 1)
+    w <- rep(0.5, basis$M + 1)
 
     # Optimize the BPR function for each element in x
     out_opt <- bpr_optim(x           = x,
                          w           = w,
                          basis       = basis,
                          method      = opt_method,
-                         itnmax      = opt_itnmax)
+                         itnmax      = opt_itnmax,
+                         is_parallel = is_parallel,
+                         no_cores    = no_cores)
 
     # Keep only the optimized coefficients
     W_opt <- out_opt$W_opt
