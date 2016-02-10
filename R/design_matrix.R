@@ -93,43 +93,32 @@ design_matrix.rbf <- function(x, obs, ...){
   assertthat::assert_that(is.vector(obs))
 
   N   <- length(obs)  # Length of the dataset
+  # TODO: Should this be here?
   #if (x$M > N - 1){
   #  stop("Number of basis functions should be less than observations!")
   #}
   if (x$M == 0){
     H <- matrix(1, nrow = N, ncol = 1)
     x$mus <- 0
-    x$gamma <- 1
   }else{
     if (is.null(x$mus)){
       if (x$eq_spaced_mus){
         x$mus <- vector(mode = "numeric", x$M)
-        if (x$whole_region){
+        if (! x$whole_region){
           # TODO: Should this be deleted or get in another way the min, max?
-          for (i in 1:x$M){
-            x$mus[i] <- i * (1 - (-1)) / (x$M + 1) + (-1)
-          }
-        }else{
           for (i in 1:x$M){
             x$mus[i] <- i * (max(obs) - min(obs)) / (x$M + 1) + min(obs)
           }
         }
       }else{
         repeat{
+          # TODO: Should this be deleted?
           km <- stats::kmeans(obs, x$M, iter.max = 30, nstart = 10)
           if (min(km$size) > 0){
             break  # Only accept non-empty clusters
           }
         }
         x$mus <- km$centers  # RBF centers
-      }
-    }
-    # TODO: Do this better!!!!
-    if (is.null(x$gamma)){
-      if (x$whole_region){
-        x$gamma <- x$M^2 / (abs(1) + abs(-1)) ^ 2
-      }else{
-        x$gamma <- x$M^2 / (abs(max(obs)) + abs(min(obs))) ^ 2
       }
     }
     # Convert the 'obs' vector to an N x 1 dimensional matrix
