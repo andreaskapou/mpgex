@@ -29,15 +29,16 @@
 #' @examples
 #' obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
 #' y   <- list(control = gex_control_data, treatment = gex_treatment_data)
-#' basis <- rbf.object(M = 3, gamma = 0.5)
-#' out   <- mpgex_diff_regr(x = obs, y = y, basis = basis, lambda = 1e-02)
+#' basis <- rbf.object(M = 3)
+#' out   <- mpgex_diff_regr(x = obs, y = y, basis = basis, is_parallel = FALSE,
+#'                          opt_itnmax = 50, lambda = 1e-02)
 #'
 #' @export
 mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                             basis = NULL, train_ind = NULL, train_perc = 0.7,
                             fit_feature = NULL, opt_method = "CG",
-                            opt_itnmax = 100, lambda = 0, x_evals = 50,
-                                                        is_summary = TRUE){
+                            opt_itnmax = 500, lambda = 0, is_parallel = TRUE,
+                            no_cores = NULL, x_evals = 50, is_summary = TRUE){
 
   # Learn methylation profiles for control samples
   message("Learning control methylation profiles ...\n")
@@ -46,7 +47,9 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                              basis       = basis,
                              fit_feature = NULL,
                              opt_method  = opt_method,
-                             opt_itnmax  = opt_itnmax)
+                             opt_itnmax  = opt_itnmax,
+                             is_parallel = is_parallel,
+                             no_cores    = no_cores)
 
   # Learn methylation profiles for treatment samples
   message("Learning treatment methylation profiles ...\n")
@@ -55,7 +58,9 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                              basis       = out_contr_opt$basis,
                              fit_feature = NULL,
                              opt_method  = opt_method,
-                             opt_itnmax  = opt_itnmax)
+                             opt_itnmax  = opt_itnmax,
+                             is_parallel = is_parallel,
+                             no_cores    = no_cores)
 
   # Learn differential methylation profile from control and treatment samples
   message("Learning differential methylation profiles ...\n")
