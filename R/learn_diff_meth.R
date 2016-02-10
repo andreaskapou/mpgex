@@ -28,8 +28,10 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
 
   # If we have 'rbf' basis, extract the Mus parameters
   if (is(contr_basis, "rbf")){
-    contr_Mus <- control$Mus
-    treat_Mus <- treatment$Mus
+    if (is.null(contr_basis$mus)){
+      contr_Mus <- control$Mus
+      treat_Mus <- treatment$Mus
+    }
   }
 
   # Data frame for storing all the coefficients for each element of list x
@@ -47,8 +49,10 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
   # Matrix for storing the centers of RBFs if object class is 'rbf'
   Mus <- NULL
   if (is(diff_basis, "rbf")){
-    Mus <- matrix(NA_real_, nrow = N, ncol = diff_basis$M)
-    colnames(Mus) <- paste("mu", seq(1, diff_basis$M), sep = "")
+    if (is.null(diff_basis$mus)){
+      Mus <- matrix(NA_real_, nrow = N, ncol = diff_basis$M)
+      colnames(Mus) <- paste("mu", seq(1, diff_basis$M), sep = "")
+    }
   }
 
   diff_meth <- matrix(NA_real_, nrow = N, ncol = x_evals)
@@ -61,8 +65,10 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
                        length.out = x_evals)
 
     if (is(contr_basis, "rbf")){
-      contr_basis$mus <- contr_Mus[i, ]
-      treat_basis$mus <- treat_Mus[i, ]
+      if (is.null(contr_basis$mus)){
+        contr_basis$mus <- contr_Mus[i, ]
+        treat_basis$mus <- treat_Mus[i, ]
+      }
     }
 
     # Evaluate the probit function for control samples
@@ -93,7 +99,9 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
     W_opt[i, ] <- w
 
     if (is(diff_basis, "rbf")){
-      Mus[i, ]   <- des_mat$basis$mus
+      if (is.null(diff_basis$mus)){
+        Mus[i, ]   <- des_mat$basis$mus
+      }
     }
   }
   return(list(W_opt      = W_opt,
