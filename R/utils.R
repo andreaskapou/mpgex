@@ -165,6 +165,7 @@ calculate_errors <- function(x, y, summary = FALSE){
 #' @examples
 #' x <- c(0.001, 0.5, 2, 1.4, 1.5)
 #' out <- log_sum_exp(x)
+#'
 #' @export
 log_sum_exp <- function(x) {
   # Computes log(sum(exp(x))
