@@ -16,7 +16,7 @@
 #' @param y The gene expression data. A list containing two vectors for control
 #' and treatment samples.
 #' @param lambda Regularization term when performing Basis Linear Model fitting
-#' @param x_evals Integer denoting the number of evaluation points when
+#' @param x_eval Integer denoting the number of evaluation points when
 #'  learning the differential methylation profiles.
 #' @inheritParams mpgex_regr
 #'
@@ -30,6 +30,7 @@
 #' obs <- list(control = bpr_control_data, treatment = bpr_treatment_data)
 #' y   <- list(control = gex_control_data, treatment = gex_treatment_data)
 #' basis <- rbf.object(M = 3)
+#' set.seed(1234)
 #' out   <- mpgex_diff_regr(x = obs, y = y, basis = basis, is_parallel = FALSE,
 #'                          opt_itnmax = 50, lambda = 1e-02)
 #'
@@ -38,7 +39,7 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                             basis = NULL, train_ind = NULL, train_perc = 0.7,
                             fit_feature = NULL, opt_method = "CG",
                             opt_itnmax = 500, lambda = 0, is_parallel = TRUE,
-                            no_cores = NULL, x_evals = 50, is_summary = TRUE){
+                            no_cores = NULL, x_eval = 50, is_summary = TRUE){
 
   # Learn methylation profiles for control samples
   message("Learning control methylation profiles ...\n")
@@ -69,11 +70,13 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                                    diff_basis  = out_contr_opt$basis,
                                    fit_feature = fit_feature,
                                    lambda      = lambda,
-                                   x_evals     = x_evals)
+                                   x_eval      = x_eval,
+                                   is_parallel = is_parallel,
+                                   no_cores    = no_cores)
 
   # TODO: Should this be division or subtraction or something more complicated
   # Compute differential gene expression
-  diff_expr <- (y$control + 1e-02) / (y$treatment + 1e-02)
+  diff_expr <- (y$control + 1e-02) - (y$treatment + 1e-02)
 
   # Create training and test sets
   message("Partitioning to test and train data ...\n")
