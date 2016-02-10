@@ -5,7 +5,8 @@
 \title{Learn differential methylation profiles using BLM}
 \usage{
 learn_diff_meth(control, treatment, diff_basis, fit_feature = NULL,
-  lambda = 0, x_evals = 50)
+  lambda = 0, x_eval = 50, is_parallel = is_parallel,
+  no_cores = no_cores)
 }
 \arguments{
 \item{control}{The optimized values for the control samples.}
@@ -19,7 +20,11 @@ methylation data.}
 
 \item{lambda}{The regularization parameter when fitting the BLM.}
 
-\item{x_evals}{Integer denoting the number of evaluation points.}
+\item{x_eval}{Integer denoting the number of evaluation points.}
+
+\item{is_parallel}{Logical, indicating if code should be run in parallel.}
+
+\item{no_cores}{Number of cores to be used, default is max_no_cores - 1.}
 }
 \value{
 The differential methylation profiles and the corresponding fitted
