@@ -43,6 +43,23 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                     FUN = function(y)
                       design_matrix(x = basis, obs = y[ ,1]))
 
+  # If parallel mode is ON
+  if (is_parallel){
+    # If number of cores is not given
+    if (is.null(no_cores)){
+      no_cores <- parallel::detectCores() - 1
+      if (no_cores > K){
+        no_cores <- K
+      }
+    }
+    if (is.na(no_cores)){
+      no_cores <- 2
+    }
+    # Create cluster object
+    cl <- parallel::makeCluster(no_cores)
+    doParallel::registerDoParallel(cl)
+  }
+
   # Run EM algorithm until convergence
   for (t in 1:em_max_iter){
 
@@ -81,16 +98,37 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     pi_k <- N_k / N
 
     # Update basis function coefficient vector w for each cluster
-    for (k in 1:K){
-      w[ ,k] <- optim(par       = w[ ,k],
-                      fn        = sum_weighted_bpr_lik,
-                      gr        = sum_weighted_bpr_grad,
-                      method    = opt_method,
-                      control   = list(maxit = opt_itnmax),
-                      x         = x,
-                      des_mat   = des_mat,
-                      post_prob = post_prob[ ,k],
-                      is_NLL    = TRUE)$par
+    # If parallel mode is ON
+    if (is_parallel){
+      # Parallel optimization for each cluster k
+      w <- foreach::"%dopar%"(obj = foreach::foreach(k = 1:K,
+                                                     .combine = cbind),
+                              ex  = {
+                          out <- optim(par       = w[ ,k],
+                                       fn        = sum_weighted_bpr_lik,
+                                       gr        = sum_weighted_bpr_grad,
+                                       method    = opt_method,
+                                       control   = list(maxit = opt_itnmax),
+                                       x         = x,
+                                       des_mat   = des_mat,
+                                       post_prob = post_prob[ ,k],
+                                       is_NLL    = TRUE)$par
+                              })
+    }else{
+      # Sequential optimization for each clustrer k
+      w <- foreach::"%do%"(obj = foreach::foreach(k = 1:K,
+                                                  .combine = cbind),
+                           ex  = {
+                         out <- optim(par       = w[ ,k],
+                                      fn        = sum_weighted_bpr_lik,
+                                      gr        = sum_weighted_bpr_grad,
+                                      method    = opt_method,
+                                      control   = list(maxit = opt_itnmax),
+                                      x         = x,
+                                      des_mat   = des_mat,
+                                      post_prob = post_prob[ ,k],
+                                      is_NLL    = TRUE)$par
+                           })
     }
 
     if (is_verbose){
@@ -106,6 +144,11 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     if (NLL[t] - NLL[t + 1] < epsilon_conv){
       break
     }
+  }
+
+  if (is_parallel){
+    # Stop parallel execution
+    parallel::stopCluster(cl)
   }
 
   # Check if EM converged in the given maximum iterations
