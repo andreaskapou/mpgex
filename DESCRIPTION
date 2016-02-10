@@ -18,4 +18,6 @@ Imports: assertthat,
     randomForest,
     e1071,
     doParallel,
-    foreach
+    foreach,
+    methods,
+    stats
