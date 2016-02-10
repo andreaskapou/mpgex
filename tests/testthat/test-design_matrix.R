@@ -13,11 +13,11 @@ test_that("Polynomial design matrix works fine", {
 })
 
 test_that("RBF design matrix works fine", {
-  rbf <- rbf.object(M = 2, gamma = 1, whole_region = FALSE)
-  obs <- c(1, 2, 3)
+  rbf <- rbf.object(M = 2, gamma = 1)
+  obs <- c(0.1, 0.3, 0.5)
   expect_is(design_matrix(rbf, obs), "list")
   expect_error(design_matrix(rbf, cbind(1, obs)))
-  expect_gt(design_matrix(rbf, obs)$basis$mus[1], 1.6)
+  expect_gt(design_matrix(rbf, obs)$basis$mus[1], -0.34)
 
   wr_basis <- structure(list(M = 2), class = "basis_x")
   expect_error(design_matrix(wr_basis))
