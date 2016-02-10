@@ -40,13 +40,14 @@
 #' @examples
 #' obs <- bpr_data
 #' y   <- gex_data
-#' basis <- rbf.object(M = 5, gamma = 0.3)
-#' out   <- mpgex_regr(x = obs, y = y, basis = basis, fit_feature = "RMSE")
+#' basis <- rbf.object(M = 5)
+#' out   <- mpgex_regr(x = obs, y = y, basis = basis, is_parallel = FALSE,
+#'                     opt_itnmax = 50)
 #'
 #' @export
 mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        basis = NULL, train_ind = NULL, train_perc = 0.7,
-                       fit_feature = NULL, opt_method = "CG", opt_itnmax = 100,
+                       fit_feature = NULL, opt_method = "CG", opt_itnmax = 500,
                        is_parallel = TRUE, no_cores = NULL, is_summary = TRUE){
 
   # Check that x is a list object
