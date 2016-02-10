@@ -51,7 +51,7 @@ polynomial.object <- function(M = 1){
 #'
 #' @export
 rbf.object <- function(M = 2, gamma = NULL, mus = NULL, eq_spaced_mus = TRUE,
-                                                      whole_region = TRUE){
+                                                         whole_region = TRUE){
   assertthat::assert_that(is.numeric(M))
   assertthat::assert_that(is.logical(eq_spaced_mus))
   assertthat::assert_that(is.logical(whole_region))
@@ -61,11 +61,20 @@ rbf.object <- function(M = 2, gamma = NULL, mus = NULL, eq_spaced_mus = TRUE,
     assertthat::assert_that(is.numeric(gamma))
     assertthat::assert_that(gamma > 0)
   }else{
-    gamma <- M^2 / (abs(1) + abs(-1)) ^ 2
+    gamma <- M ^ 2 / ( abs(1) + abs(-1) ) ^ 2
   }
   if (! is.null(mus)){
     assertthat::assert_that(is.vector(mus))
     assertthat::assert_that(M == length(mus))
+  }else{
+    if (eq_spaced_mus){
+      mus <- vector(mode = "numeric", M)
+      if (whole_region){
+        for (i in 1:M){
+          mus[i] <- i * ( (1 - (-1)) / (M + 1) ) + (-1)
+        }
+      }
+    }
   }
   obj <- structure(list(M = M,
                         mus = mus,
@@ -116,7 +125,7 @@ polynomial_basis <- function(X, M = 1){
 #' @seealso \code{\link{polynomial_basis}}
 #'
 #' @examples
-#' out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 1)
+#' out <- rbf_basis(X = c(1,2), mus = c(1,1))
 #' #
 #' out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 0.1)
 #'
