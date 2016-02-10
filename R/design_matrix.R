@@ -54,7 +54,7 @@ design_matrix.default <- function(x, ...){
 #'
 #' @export
 design_matrix.polynomial <- function(x, obs, ...){
-  assertthat::assert_that(is(x, "polynomial"))
+  assertthat::assert_that(methods::is(x, "polynomial"))
   assertthat::assert_that(is.vector(obs))
 
   N <- length(obs)  # Length of the dataset
@@ -89,7 +89,7 @@ design_matrix.polynomial <- function(x, obs, ...){
 #'
 #' @export
 design_matrix.rbf <- function(x, obs, ...){
-  assertthat::assert_that(is(x, "rbf"))
+  assertthat::assert_that(methods::is(x, "rbf"))
   assertthat::assert_that(is.vector(obs))
 
   N   <- length(obs)  # Length of the dataset

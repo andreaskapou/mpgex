@@ -16,6 +16,7 @@
 #'
 #' @seealso \code{\link{calculate_errors}}, \code{\link{train_model_gex}}
 #'
+#' @importFrom stats lm predict
 #' @export
 predict_model_gex <- function(model, test, is_summary = TRUE){
   # Convert to a data.frame

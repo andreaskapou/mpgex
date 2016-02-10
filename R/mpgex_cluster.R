@@ -70,10 +70,10 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   total_params <- (K - 1) + K * NROW(w)
 
   # Bayesian Information Criterion
-  mpgex$BIC <- 2 * tail(mpgex$NLL, n = 1) + total_params * log(N)
+  mpgex$BIC <- 2 * utils::tail(mpgex$NLL, n = 1) + total_params * log(N)
 
   # Akaike Iformation Criterion
-  mpgex$AIC <- 2 * tail(mpgex$NLL, n = 1) + 2 * total_params
+  mpgex$AIC <- 2 * utils::tail(mpgex$NLL, n = 1) + 2 * total_params
 
   # Integrated Complete Likelihood criterion
   entropy <- (-1) * sum(mpgex$post_prob * log(mpgex$post_prob),
@@ -109,7 +109,7 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     W_opt <- out_opt$W_opt
 
     # Use Kmeans with random starts
-    cl <- kmeans(W_opt, K, nstart = 25)
+    cl <- stats::kmeans(W_opt, K, nstart = 25)
     # Get the mixture components
     C_n <- cl$cluster
     # Mean for each cluster

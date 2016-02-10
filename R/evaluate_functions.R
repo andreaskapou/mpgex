@@ -79,7 +79,7 @@ eval_function.default <- function(x, ...){
 #'
 #' @export
 eval_function.polynomial <- function(x, obs, w, ...){
-  assertthat::assert_that(is(x, "polynomial"))
+  assertthat::assert_that(methods::is(x, "polynomial"))
   assertthat::assert_that(is.vector(obs))
   assertthat::assert_that(is.vector(w))
 
@@ -110,7 +110,7 @@ eval_function.polynomial <- function(x, obs, w, ...){
 #'
 #' @export
 eval_function.rbf <- function(x, obs, w, ...){
-  assertthat::assert_that(is(x, "rbf"))
+  assertthat::assert_that(methods::is(x, "rbf"))
   assertthat::assert_that(is.vector(w))
   assertthat::assert_that(!is.null(x$mus))
 

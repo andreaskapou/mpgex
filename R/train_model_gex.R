@@ -20,6 +20,7 @@
 #'
 #' @seealso \code{\link{calculate_errors}}, \code{\link{predict_model_gex}}
 #'
+#' @importFrom stats formula predict
 #' @export
 train_model_gex <- function(formula = NULL, model_name = "svm", train,
                                                     is_summary = TRUE){
@@ -41,8 +42,8 @@ train_model_gex <- function(formula = NULL, model_name = "svm", train,
                         kernel="radial",
                         cross=10)
   }else{
-    model <- lm(formula = formula,
-                data = train)
+    model <- stats::lm(formula = formula,
+                       data = train)
   }
 
   # Make predictions

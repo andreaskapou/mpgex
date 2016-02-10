@@ -23,6 +23,7 @@
 #' @param no_cores Number of cores to be used, default is max_no_cores - 1.
 #' @param is_verbose Logical, print results during EM iterations
 #'
+#' @importFrom stats optim
 #' @export
 bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                    em_max_iter = 100, epsilon_conv = 1e-05, opt_method = "CG",
@@ -104,30 +105,30 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
       w <- foreach::"%dopar%"(obj = foreach::foreach(k = 1:K,
                                                      .combine = cbind),
                               ex  = {
-                          out <- optim(par       = w[ ,k],
-                                       fn        = sum_weighted_bpr_lik,
-                                       gr        = sum_weighted_bpr_grad,
-                                       method    = opt_method,
-                                       control   = list(maxit = opt_itnmax),
-                                       x         = x,
-                                       des_mat   = des_mat,
-                                       post_prob = post_prob[ ,k],
-                                       is_NLL    = TRUE)$par
+                        out <- optim(par       = w[ ,k],
+                                     fn        = sum_weighted_bpr_lik,
+                                     gr        = sum_weighted_bpr_grad,
+                                     method    = opt_method,
+                                     control   = list(maxit = opt_itnmax),
+                                     x         = x,
+                                     des_mat   = des_mat,
+                                     post_prob = post_prob[ ,k],
+                                     is_NLL    = TRUE)$par
                               })
     }else{
       # Sequential optimization for each clustrer k
       w <- foreach::"%do%"(obj = foreach::foreach(k = 1:K,
                                                   .combine = cbind),
                            ex  = {
-                         out <- optim(par       = w[ ,k],
-                                      fn        = sum_weighted_bpr_lik,
-                                      gr        = sum_weighted_bpr_grad,
-                                      method    = opt_method,
-                                      control   = list(maxit = opt_itnmax),
-                                      x         = x,
-                                      des_mat   = des_mat,
-                                      post_prob = post_prob[ ,k],
-                                      is_NLL    = TRUE)$par
+                     out <- optim(par       = w[ ,k],
+                                  fn        = sum_weighted_bpr_lik,
+                                  gr        = sum_weighted_bpr_grad,
+                                  method    = opt_method,
+                                  control   = list(maxit = opt_itnmax),
+                                  x         = x,
+                                  des_mat   = des_mat,
+                                  post_prob = post_prob[ ,k],
+                                  is_NLL    = TRUE)$par
                            })
     }
 

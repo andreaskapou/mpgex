@@ -84,12 +84,12 @@ blm <- function(x, y, basis, lambda = 0, return.all = TRUE){
 #' @export
 predict.blm <- function(object, newdata = NULL, ...){
   if(is.null(newdata)){
-    y <- fitted(object)
+    y <- stats::fitted(object)
   }
   else{
     # Create the design matrix
     H <- design_matrix(x = object$basis, obs = newdata)$H
-    y <- as.vector(H %*% coef(object))
+    y <- as.vector(H %*% stats::coef(object))
   }
   return(y)
 }
@@ -125,12 +125,12 @@ print.blm <- function(x, ...){
 #' @export
 summary.blm <- function(object, ...){
   se <- sqrt(diag(object$vcov))
-  tval <- coef(object) / se
+  tval <- stats::coef(object) / se
 
-  TAB <- cbind(Estimate = coef(object),
+  TAB <- cbind(Estimate = stats::coef(object),
                StdErr = se,
                t.value = tval,
-               p.value = 2 * pt(-abs(tval), df = object$df))
+               p.value = 2 * stats::pt(-abs(tval), df = object$df))
   colnames(TAB) <- c("Estimate", "Std.Err", "t value", "Pr(>|t|)")
   res <- structure(list(call = object$call,
                         coefficients = TAB),
@@ -152,5 +152,5 @@ print.summary.blm <- function(x, ...){
   cat("Call:\n")
   print(x$call)
   cat("\n")
-  printCoefmat(x$coefficients, P.values = TRUE, has.Pvalue = TRUE)
+  stats::printCoefmat(x$coefficients, P.values = TRUE, has.Pvalue = TRUE)
 }

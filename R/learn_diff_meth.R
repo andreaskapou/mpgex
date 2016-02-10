@@ -16,6 +16,7 @@
 #' @return The differential methylation profiles and the corresponding fitted
 #'  coefficients from the BLM model.
 #'
+#' @importFrom methods is
 #' @export
 learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
                             lambda = 0, x_eval = 50, is_parallel = is_parallel,
@@ -32,7 +33,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
   contr_Mus <- NULL
   treat_Mus <- NULL
   # If we have 'rbf' basis, extract the Mus parameters
-  if (is(contr_basis, "rbf")){
+  if (methods::is(contr_basis, "rbf")){
     if (is.null(contr_basis$mus)){
       contr_Mus <- control$Mus
       treat_Mus <- treatment$Mus
@@ -102,7 +103,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
 
   # Matrix for storing the centers of RBFs if object class is 'rbf'
   Mus <- NULL
-  if (is(diff_basis, "rbf")){
+  if (methods::is(diff_basis, "rbf")){
     if (is.null(diff_basis$mus)){
       Mus <- sapply(res, function(x) x$Mus)
       if (is.matrix(Mus)){
@@ -151,7 +152,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
                 to   = max(contr_extr[2], treat_extr[2]),
                 length.out = x_eval)
 
-  if (is(contr_basis, "rbf")){
+  if (methods::is(contr_basis, "rbf")){
     if (is.null(contr_basis$mus)){
       contr_basis$mus <- contr_Mus
       treat_basis$mus <- treat_Mus
@@ -174,16 +175,16 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
   dataset <- data.frame(des_mat$H[, 2:NCOL(des_mat$H)], y = diff_meth)
 
   # Fit the model to the data using lm
-  model <- lm(formula = y ~ ., data = dataset)
+  model <- stats::lm(formula = y ~ ., data = dataset)
 
   if (is.null(fit_feature)){
-    w <- coef(model)
+    w <- stats::coef(model)
   }else{
-    w <- c(coef(model), summary(model)$sigma)
+    w <- c(stats::coef(model), summary(model)$sigma)
   }
 
   Mus <- NULL
-  if (is(diff_basis, "rbf")){
+  if (methods::is(diff_basis, "rbf")){
     if (is.null(diff_basis$mus)){
       Mus <- des_mat$basis$mus
     }

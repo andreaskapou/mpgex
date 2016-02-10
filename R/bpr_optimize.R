@@ -133,7 +133,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 
   # Matrix for storing the centers of RBFs if object class is 'rbf'
   Mus <- NULL
-  if (is(basis, "rbf")){
+  if (methods::is(basis, "rbf")){
     if (is.null(basis$mus)){
       Mus <- sapply(lapply(res, function(x) x$basis), function(y) y$mus)
       if (is.matrix(Mus)){
