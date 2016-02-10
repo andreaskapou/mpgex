@@ -6,7 +6,8 @@
 \usage{
 mpgex_cluster(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   em_max_iter = 100, epsilon_conv = 1e-05, opt_method = "CG",
-  opt_itnmax = 100, is_verbose = FALSE)
+  opt_itnmax = 500, is_parallel = TRUE, no_cores = NULL,
+  is_verbose = FALSE)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -33,6 +34,10 @@ coefficients for the corresponding cluster.}
 \item{opt_itnmax}{Optional argument giving the maximum number of iterations
 for the corresponding method. See \code{\link[stats]{optim}} for details.}
 
+\item{is_parallel}{Logical, indicating if code should be run in parallel.}
+
+\item{no_cores}{Number of cores to be used, default is max_no_cores - 1.}
+
 \item{is_verbose}{Logical, print results during EM iterations}
 }
 \description{
@@ -44,7 +49,8 @@ metrics are calculated, such as BIC and AIC.
 }
 \examples{
 ex_data <- bpr_data
-mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 10, opt_itnmax = 10)
+mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 5, is_parallel = FALSE,
+                             opt_itnmax = 10)
 
 }
 

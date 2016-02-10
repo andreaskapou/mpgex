@@ -19,6 +19,7 @@ underflow and have numeric stability in computations of small numbers.
 \examples{
 x <- c(0.001, 0.5, 2, 1.4, 1.5)
 out <- log_sum_exp(x)
+
 }
 \references{
 \url{https://hips.seas.harvard.edu/blog/2013/01/09/computing-log-sum-exp/}

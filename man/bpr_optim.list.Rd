@@ -61,7 +61,7 @@ to process each element of the list.
 \examples{
 ex_data <- bpr_data
 basis <- rbf.object(M=3)
-out_opt <- bpr_optim(x = ex_data, basis = basis, opt_method = "CG")
+out_opt <- bpr_optim(x = ex_data, is_parallel = FALSE, basis = basis, opt_method = "CG")
 
 }
 \seealso{

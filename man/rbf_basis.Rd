@@ -20,7 +20,7 @@ Input X, after being transformed from the RBF.
 Apply the RBF function to the input X with center mus.
 }
 \examples{
-out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 1)
+out <- rbf_basis(X = c(1,2), mus = c(1,1))
 #
 out <- rbf_basis(X = c(1,2), mus = c(1,1), gamma = 0.1)
 
