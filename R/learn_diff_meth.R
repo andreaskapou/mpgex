@@ -48,7 +48,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
   if (is_parallel){
     # If number of cores is not given
     if (is.null(no_cores)){
-      no_cores <- parallel::detectCores() - 1
+      no_cores <- parallel::detectCores() - 2
     }
     if (is.na(no_cores)){
       no_cores <- 2

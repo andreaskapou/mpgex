@@ -48,7 +48,7 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   if (is_parallel){
     # If number of cores is not given
     if (is.null(no_cores)){
-      no_cores <- parallel::detectCores() - 1
+      no_cores <- parallel::detectCores() - 2
       if (no_cores > K){
         no_cores <- K
       }
