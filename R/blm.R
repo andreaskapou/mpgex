@@ -47,6 +47,8 @@ blm <- function(x, y, basis, lambda = 0, return.all = TRUE){
     est$coefficients <- solve.qr(qx, t(H) %*% y)
   }
 
+  # Standard deviation of residuals
+  est$sigma <- sqrt(sum(est$residuals ^ 2) / est$df.residuals)
   if (return.all){
     # Fitted values
     est$fitted.values <- as.vector(H %*% est$coefficients)
@@ -54,8 +56,6 @@ blm <- function(x, y, basis, lambda = 0, return.all = TRUE){
     est$residuals <- y - est$fitted.values
     # Degrees of freedom
     est$df.residuals <- NROW(H) - NCOL(H)
-    # Standard deviation of residuals
-    est$sigma <- sqrt(sum(est$residuals ^ 2) / est$df.residuals)
     # Compute sigma^2 * (x'x)^(-1)
     est$vcov <- est$sigma ^ 2 * chol2inv(qx$qr)
     colnames(est$vcov) <- rownames(est$vcov) <- colnames(H)
