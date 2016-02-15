@@ -50,11 +50,16 @@ train_model_gex <- function(formula = NULL, model_name = "svm", train,
   train_pred <- predict(object = model,
                         type   = "response")
 
-  # Calculate model errors
-  if (is_summary) message("-- Train Errors --")
-  train_errors <- calculate_errors(x = train$y,
-                                   y = train_pred,
-                                   summary = is_summary)
+  if (length(train_pred) != length(train$y)){
+    warning("The regression model returned NAs")
+    train_errors = NULL
+  }else{
+    # Calculate model errors
+    if (is_summary) message("-- Train Errors --")
+    train_errors <- calculate_errors(x = train$y,
+                                     y = train_pred,
+                                     summary = is_summary)
+  }
 
   out <- list(formula      = formula,
               gex_model    = model,
