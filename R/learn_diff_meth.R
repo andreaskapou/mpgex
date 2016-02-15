@@ -65,6 +65,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
                                               contr_basis = contr_basis,
                                               treat_basis = treat_basis,
                                               diff_basis  = diff_basis,
+                                              lambda      = lambda,
                                               fit_feature = fit_feature,
                                               contr_extr  = contr_extr[i, ],
                                               treat_extr  = treat_extr[i, ],
@@ -83,6 +84,7 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
                                             contr_basis = contr_basis,
                                             treat_basis = treat_basis,
                                             diff_basis  = diff_basis,
+                                            lambda      = lambda,
                                             fit_feature = fit_feature,
                                             contr_extr  = contr_extr[i, ],
                                             treat_extr  = treat_extr[i, ],
@@ -145,8 +147,8 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
 # Private function for fitting differential methylation profiles
 # for a given region
 .fit_diff_meth <- function(contr_W, treat_W, contr_basis, treat_basis,
-                           diff_basis, fit_feature, contr_extr, treat_extr,
-                           contr_Mus, treat_Mus, x_eval){
+                           diff_basis, lambda, fit_feature, contr_extr,
+                           treat_extr, contr_Mus, treat_Mus, x_eval){
   # TODO: Choose more efficiently the x points or better?
   xs_mat <- seq(from = min(contr_extr[1], treat_extr[1]),
                 to   = max(contr_extr[2], treat_extr[2]),
@@ -168,24 +170,32 @@ learn_diff_meth <- function(control, treatment, diff_basis, fit_feature = NULL,
   # Obtain the difference bewteen the two methylation profiles
   diff_meth <- y_contr - y_treat
 
-  # Create the design matrix
-  des_mat <- design_matrix(x = diff_basis, obs = xs_mat)
-
-  # Create a data frame containing the regressors x and the target value y
-  dataset <- data.frame(des_mat$H[, 2:NCOL(des_mat$H)], y = diff_meth)
-
-  # Fit the model to the data using lm
-  model <- stats::lm(formula = y ~ ., data = dataset)
+  # Fit the model to the data using the blm
+  model <- blm(x          = xs_mat,
+               y          = diff_meth,
+               basis      = diff_basis,
+               lambda     = lambda,
+               return.all = FALSE)
 
   if (is.null(fit_feature)){
-    w <- stats::coef(model)
+    w <- model$coefficients
   }else{
-    w <- c(stats::coef(model), summary(model)$sigma)
+    w <- c(model$coefficients, model$sigma)
   }
+
+#   # Create the design matrix
+#   des_mat <- design_matrix(x = diff_basis, obs = xs_mat)
+#
+#   # Create a data frame containing the regressors x and the target value y
+#   dataset <- data.frame(des_mat$H[, 2:NCOL(des_mat$H)], y = diff_meth)
+#
+#   # Fit the model to the data using lm
+#   model <- stats::lm(formula = y ~ ., data = dataset)
 
   Mus <- NULL
   if (methods::is(diff_basis, "rbf")){
     if (is.null(diff_basis$mus)){
+      des_mat <- design_matrix(x = diff_basis, obs = xs_mat)
       Mus <- des_mat$basis$mus
     }
   }
