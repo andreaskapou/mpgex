@@ -15,6 +15,8 @@
 #'  where each element is an L x 3 dimensional matrix.
 #' @param y The gene expression data. A list containing two vectors for control
 #' and treatment samples.
+#' @param diff_basis The differential basis object, if NULL, the main basis
+#'  object will be created.
 #' @param lambda Regularization term when performing Basis Linear Model fitting
 #' @param x_eval Integer denoting the number of evaluation points when
 #'  learning the differential methylation profiles.
@@ -36,7 +38,8 @@
 #'
 #' @export
 mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
-                            basis = NULL, train_ind = NULL, train_perc = 0.7,
+                            basis = NULL, diff_basis = NULL, train_ind = NULL,
+                            train_perc = 0.7,
                             fit_feature = NULL, opt_method = "CG",
                             opt_itnmax = 500, lambda = 0, is_parallel = TRUE,
                             no_cores = NULL, x_eval = 50, is_summary = TRUE){
@@ -63,11 +66,16 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                              is_parallel = is_parallel,
                              no_cores    = no_cores)
 
+  # Choose by default an RBF basis with 3 kernels
+  if (is.null(diff_basis)){
+    diff_basis <- out_contr_opt$basis
+  }
+
   # Learn differential methylation profile from control and treatment samples
   message("Learning differential methylation profiles ...\n")
   out_diff_meth <- learn_diff_meth(control     = out_contr_opt,
                                    treatment   = out_treat_opt,
-                                   diff_basis  = out_contr_opt$basis,
+                                   diff_basis  = diff_basis,
                                    fit_feature = fit_feature,
                                    lambda      = lambda,
                                    x_eval      = x_eval,
@@ -110,6 +118,10 @@ mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                         test_pred    = predictions$test_pred,
                         train_errors = train_model$train_errors,
                         test_errors  = predictions$test_errors,
+                        diff_expr    = diff_expr,
+                        diff_meth    = out_diff_meth$diff_meth,
+                        diff_basis   = diff_basis,
+                        xs_mat       = out_diff_meth$xs_mat,
                         train        = dataset$train,
                         test         = dataset$test,
                         basis        = out_contr_opt$basis,
