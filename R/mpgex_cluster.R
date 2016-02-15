@@ -36,9 +36,9 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                        opt_itnmax = opt_itnmax,
                        is_parallel = is_parallel,
                        no_cores    = no_cores)
-  w   <- out$w
+  w     <- out$w
   basis <- out$basis
-  pi_k <- out$pi_k
+  pi_k  <- out$pi_k
 
   # Apply EM algorithm to cluster similar methylation profiles
   message("Clustering methylation profiles via EM ...\n")
