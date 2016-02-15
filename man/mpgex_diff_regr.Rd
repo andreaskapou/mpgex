@@ -5,9 +5,9 @@
 \title{Predict differntial gene expression from differential methylation}
 \usage{
 mpgex_diff_regr(formula = NULL, x, y, model_name = "svm", w = NULL,
-  basis = NULL, train_ind = NULL, train_perc = 0.7, fit_feature = NULL,
-  opt_method = "CG", opt_itnmax = 500, lambda = 0, is_parallel = TRUE,
-  no_cores = NULL, x_eval = 50, is_summary = TRUE)
+  basis = NULL, diff_basis = NULL, train_ind = NULL, train_perc = 0.7,
+  fit_feature = NULL, opt_method = "CG", opt_itnmax = 500, lambda = 0,
+  is_parallel = TRUE, no_cores = NULL, x_eval = 50, is_summary = TRUE)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -27,6 +27,9 @@ and treatment samples.}
 
 \item{basis}{Optional basis function object, default is
 \code{\link{polynomial.object}}}
+
+\item{diff_basis}{The differential basis object, if NULL, the main basis
+object will be created.}
 
 \item{train_ind}{Optional vector containing the indices for the
 train set.}
