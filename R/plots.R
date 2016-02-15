@@ -51,7 +51,7 @@ plot.rbf <- function(x, obs, w, ...){
 #' @param ... Additional parameters
 #'
 #' @export
-plot.diff_mpgex <- function(x, t, ...){
+plot.mpgex_diff_regr <- function(x, t, ...){
   basis <- x$diff_basis
   obs <- x$diff_meth[t, ]
   w <- x$W_opt[t, ]
