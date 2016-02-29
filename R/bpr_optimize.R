@@ -67,8 +67,9 @@ bpr_optim.default <- function(x, ...){
 #'
 #' @export
 bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
-                           opt_method = "CG", opt_itnmax = 100,
-                           is_parallel = TRUE, no_cores = NULL, ...){
+                           cpg_dens_feat = FALSE, opt_method = "CG",
+                           opt_itnmax = 100, is_parallel = TRUE,
+                           no_cores = NULL, ...){
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
 
@@ -104,6 +105,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
                                   w           = w,
                                   basis       = basis,
                                   fit_feature = fit_feature,
+                                  cpg_dens_feat = cpg_dens_feat,
                                   opt_method  = opt_method,
                                   opt_itnmax  = opt_itnmax)
                               })
@@ -117,6 +119,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
                                   w           = w,
                                   basis       = basis,
                                   fit_feature = fit_feature,
+                                  cpg_dens_feat = cpg_dens_feat,
                                   opt_method  = opt_method,
                                   opt_itnmax  = opt_itnmax)
                           })
@@ -170,6 +173,8 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' @param basis A 'basis' object. See \code{\link{polynomial.object}}
 #' @param fit_feature Additional feature on how well the profile fits the
 #'  methylation data.
+#' @param cpg_dens_feat Additional feature for the CpG density across the
+#'  promoter region.
 #' @param opt_method The optimization method to be used. See
 #'  \code{\link[stats]{optim}} for possible methods. Default is 'CG'.
 #' @param opt_itnmax Optional argument giving the maximum number of iterations
@@ -197,7 +202,8 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #'
 #' @export
 bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
-                                     opt_method = "CG", opt_itnmax = 100, ...){
+                             cpg_dens_feat = FALSE, opt_method = "CG",
+                             opt_itnmax = 100, ...){
   # Vector for storing CpG locations relative to TSS
   obs <- as.vector(x[ ,1])
 
@@ -233,6 +239,11 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
       fit <- sqrt(mean( (f_pred - f_true) ^ 2) )
     }
     w_opt <- c(w_opt, fit)
+  }
+
+  # Add as feature the CpG density in the promoter region
+  if (cpg_dens_feat){
+    w_opt <- c(w_opt, length(obs))
   }
 
   return(list(w_opt = w_opt,

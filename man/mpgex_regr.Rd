@@ -6,8 +6,8 @@
 \usage{
 mpgex_regr(formula = NULL, x, y, model_name = "svm", w = NULL,
   basis = NULL, train_ind = NULL, train_perc = 0.7, fit_feature = NULL,
-  opt_method = "CG", opt_itnmax = 500, is_parallel = TRUE,
-  no_cores = NULL, is_summary = TRUE)
+  cpg_dens_feat = FALSE, opt_method = "CG", opt_itnmax = 500,
+  is_parallel = TRUE, no_cores = NULL, is_summary = TRUE)
 }
 \arguments{
 \item{formula}{An object of class \code{\link[stats]{formula}} needed when
@@ -34,6 +34,9 @@ dataset to be used for training set, the remaining will be the test set.}
 
 \item{fit_feature}{Additional feature on how well the profile fits the
 methylation data.}
+
+\item{cpg_dens_feat}{Additional feature for the CpG density across the
+promoter region.}
 
 \item{opt_method}{Parameter for defining the method to be used in the
 optimization procedure, see \code{\link[stats]{optim}}.}

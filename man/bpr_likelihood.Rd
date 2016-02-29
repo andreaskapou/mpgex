@@ -36,7 +36,7 @@ the log likelihood
 }
 \examples{
 obj <- polynomial.object(M=2)
-obs <- c(0,.2,.5)
+obs <- c(0,.2,.5, 0.6)
 des_mat <- design_matrix(obj, obs)
 H <- des_mat$H
 w <- c(.1,.1,.1)

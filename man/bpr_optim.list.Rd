@@ -5,8 +5,8 @@
 \title{Optimization method for the BPR NLL function using list x}
 \usage{
 \method{bpr_optim}{list}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  opt_method = "CG", opt_itnmax = 100, is_parallel = TRUE,
-  no_cores = NULL, ...)
+  cpg_dens_feat = FALSE, opt_method = "CG", opt_itnmax = 100,
+  is_parallel = TRUE, no_cores = NULL, ...)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -20,6 +20,9 @@ corresponding locations, repsectively.}
 
 \item{fit_feature}{Additional feature on how well the profile fits the
 methylation data.}
+
+\item{cpg_dens_feat}{Additional feature for the CpG density across the
+promoter region.}
 
 \item{opt_method}{The optimization method to be used. See
 \code{\link[stats]{optim}} for possible methods. Default is 'CG'.}

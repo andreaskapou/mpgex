@@ -5,7 +5,7 @@
 \title{Optimization method for the BPR NLL using matrix x}
 \usage{
 \method{bpr_optim}{matrix}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  opt_method = "CG", opt_itnmax = 100, ...)
+  cpg_dens_feat = FALSE, opt_method = "CG", opt_itnmax = 100, ...)
 }
 \arguments{
 \item{x}{An L x 3 matrix of observations, where 1st column contains the
@@ -18,6 +18,9 @@ successes at the corresponding locations, repsectively.}
 
 \item{fit_feature}{Additional feature on how well the profile fits the
 methylation data.}
+
+\item{cpg_dens_feat}{Additional feature for the CpG density across the
+promoter region.}
 
 \item{opt_method}{The optimization method to be used. See
 \code{\link[stats]{optim}} for possible methods. Default is 'CG'.}

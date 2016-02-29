@@ -23,6 +23,8 @@
 #'  dataset to be used for training set, the remaining will be the test set.
 #' @param fit_feature Additional feature on how well the profile fits the
 #'  methylation data.
+#' @param cpg_dens_feat Additional feature for the CpG density across the
+#'  promoter region.
 #' @param opt_method Parameter for defining the method to be used in the
 #'  optimization procedure, see \code{\link[stats]{optim}}.
 #' @param opt_itnmax Optional parameter for defining the max number of
@@ -47,7 +49,8 @@
 #' @export
 mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        basis = NULL, train_ind = NULL, train_perc = 0.7,
-                       fit_feature = NULL, opt_method = "CG", opt_itnmax = 500,
+                       fit_feature = NULL, cpg_dens_feat = FALSE,
+                       opt_method = "CG", opt_itnmax = 500,
                        is_parallel = TRUE, no_cores = NULL, is_summary = TRUE){
 
   # Check that x is a list object
@@ -59,6 +62,7 @@ mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        w           = w,
                        basis       = basis,
                        fit_feature = fit_feature,
+                       cpg_dens_feat = cpg_dens_feat,
                        opt_method  = opt_method,
                        opt_itnmax  = opt_itnmax,
                        is_parallel = is_parallel,
