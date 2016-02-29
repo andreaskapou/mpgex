@@ -39,11 +39,6 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   # Initialize and store NLL for each EM iteration
   NLL <- c(1e+40)
 
-  # Create design matrix for each observation
-  des_mat <- lapply(X   = x,
-                    FUN = function(y)
-                      design_matrix(x = basis, obs = y[ ,1]))
-
   # If parallel mode is ON
   if (is_parallel){
     # If number of cores is not given
@@ -59,6 +54,19 @@ bpr_EM <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     # Create cluster object
     cl <- parallel::makeCluster(no_cores)
     doParallel::registerDoParallel(cl)
+  }
+
+  if (is_parallel){
+    # Create design matrix for each observation
+    des_mat <- parallel::mclapply(X   = x,
+                                  FUN = function(y)
+                                    design_matrix(x = basis, obs = y[ ,1]),
+                                  mc.cores = no_cores)
+  }else{
+    # Create design matrix for each observation
+    des_mat <- lapply(X   = x,
+                      FUN = function(y)
+                        design_matrix(x = basis, obs = y[ ,1]))
   }
 
   # Run EM algorithm until convergence
