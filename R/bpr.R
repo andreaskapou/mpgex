@@ -107,12 +107,16 @@ bpr_gradient <- function(w, H, data, is_NLL = FALSE){
   N[which(N < 1e-289)] <- 1e-289
 
   # Compute the gradient vector w.r.t the coefficients w
-  if (NROW(H) == 1){
-    gr <- (succ * (1 / Phi) - (total - succ) * (1 / (1 - Phi))) * N %*% H
-  }else{
-    gr <- (t(succ) %*% diag(1 / Phi) - t(total - succ) %*%
-             diag(1 / (1 - Phi))) %*% diag(N) %*% H - w
-  }
+  gr <- (N * (succ * (1/Phi) - (total - succ) * (1 / (1 - Phi)))) %*% H - w
+
+#   if (NROW(H) == 1){
+#     gr <- (succ * (1 / Phi) - (total - succ) * (1 / (1 - Phi))) * N %*% H - w
+#   }else{
+#     gr <- (t(succ) %*% diag(1 / Phi) - t(total - succ) %*%
+#              diag(1 / (1 - Phi))) %*% diag(N) %*% H - w
+#
+#     (N * (succ * (1/Phi) - (total - succ) * (1 / (1 - Phi)))) %*% H - w
+#   }
 
   # If we required the Negative Log Likelihood
   if (is_NLL){
