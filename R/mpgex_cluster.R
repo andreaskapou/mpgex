@@ -6,6 +6,8 @@
 #' coefficients, then the EM algorithm is applied and finally model selection
 #' metrics are calculated, such as BIC and AIC.
 #'
+#' @param init_opt_itnmax Optimization iterations for obtaining the initial EM
+#'  parameter values.
 #' @inheritParams bpr_EM
 #'
 #' @examples
@@ -14,11 +16,11 @@
 #'                              opt_itnmax = 10)
 #'
 #' @export
-mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
-                          em_max_iter = 100, epsilon_conv = 1e-05,
-                          opt_method = "CG", opt_itnmax = 500,
-                          is_parallel = TRUE, no_cores = NULL,
-                                             is_verbose = FALSE){
+mpgex_cluster <- function(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
+                          em_max_iter = 100, epsilon_conv = 1e-04,
+                          opt_method = "CG", opt_itnmax = 100,
+                          init_opt_itnmax = 100, is_parallel = TRUE,
+                          no_cores = NULL, is_verbose = FALSE){
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
 
@@ -34,6 +36,7 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                        basis = basis,
                        opt_method = opt_method,
                        opt_itnmax = opt_itnmax,
+                       init_opt_itnmax = init_opt_itnmax,
                        is_parallel = is_parallel,
                        no_cores    = no_cores)
   w     <- out$w
@@ -61,10 +64,10 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   colnames(mpgex$w) <- paste0("clust", 1:K)
 
   # Get hard cluster assignments for each observation
-  mpgex$labels <- apply(X = mpgex$post_prob,
-                              MARGIN = 1,
-                              FUN = function(x)
-                                      which(x == max(x, na.rm = TRUE)))
+  mpgex$labels <- apply(X      = mpgex$post_prob,
+                        MARGIN = 1,
+                        FUN    = function(x)
+                          which(x == max(x, na.rm = TRUE)))
 
   # Perform model selection
   total_params <- (K - 1) + K * NROW(w)
@@ -88,7 +91,7 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
 
 # Internal function to make all the appropriate type checks.
 .do_EM_checks <- function(x, K = 2, pi_k = NULL,  w = NULL, basis = NULL,
-                          opt_method = "CG", opt_itnmax = 100,
+                          opt_method = "CG", init_opt_itnmax = 100,
                           is_parallel = TRUE, no_cores = NULL){
   if (is.null(basis)){
     basis <- rbf.object(M = 3)
@@ -101,7 +104,7 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                          w           = w,
                          basis       = basis,
                          method      = opt_method,
-                         itnmax      = opt_itnmax,
+                         itnmax      = init_opt_itnmax,
                          is_parallel = is_parallel,
                          no_cores    = no_cores)
 
@@ -120,6 +123,9 @@ mpgex_cluster <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
       N <- length(x)
       pi_k <- as.vector(table(C_n) / N)
     }
+  }
+  if (is.null(pi_k)){
+    pi_k <- rep(1 / K, K)
   }
   if (NROW(w) != (basis$M + 1) ){
     stop("Coefficients vector should be M+1, M: number of basis functions!")
