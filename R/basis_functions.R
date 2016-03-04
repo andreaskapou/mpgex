@@ -131,5 +131,5 @@ polynomial_basis <- function(X, M = 1){
 #'
 #' @export
 rbf_basis <- function(X, mus, gamma = 1){
-  return(exp( (-1) * gamma * norm(as.matrix(X - mus), "F") ^ 2))
+  return(exp( (-1) * gamma * sum((X - mus)^2)))
 }
