@@ -90,6 +90,10 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
     # If number of cores is not given
     if (is.null(no_cores)){
       no_cores <- parallel::detectCores() - 2
+    }else{
+      if (no_cores >= parallel::detectCores()){
+        no_cores <- parallel::detectCores() - 1
+      }
     }
     if (is.na(no_cores)){
       no_cores <- 2
