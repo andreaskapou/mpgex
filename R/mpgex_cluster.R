@@ -35,7 +35,6 @@ mpgex_cluster <- function(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
                        w = w,
                        basis = basis,
                        opt_method = opt_method,
-                       opt_itnmax = opt_itnmax,
                        init_opt_itnmax = init_opt_itnmax,
                        is_parallel = is_parallel,
                        no_cores    = no_cores)
