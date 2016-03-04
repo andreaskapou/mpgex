@@ -4,10 +4,10 @@
 \alias{mpgex_cluster}
 \title{Cluster similar methylation profiles}
 \usage{
-mpgex_cluster(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
-  em_max_iter = 100, epsilon_conv = 1e-05, opt_method = "CG",
-  opt_itnmax = 500, is_parallel = TRUE, no_cores = NULL,
-  is_verbose = FALSE)
+mpgex_cluster(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
+  em_max_iter = 100, epsilon_conv = 1e-04, opt_method = "CG",
+  opt_itnmax = 100, init_opt_itnmax = 100, is_parallel = TRUE,
+  no_cores = NULL, is_verbose = FALSE)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -33,6 +33,9 @@ coefficients for the corresponding cluster.}
 
 \item{opt_itnmax}{Optional argument giving the maximum number of iterations
 for the corresponding method. See \code{\link[stats]{optim}} for details.}
+
+\item{init_opt_itnmax}{Optimization iterations for obtaining the initial EM
+parameter values.}
 
 \item{is_parallel}{Logical, indicating if code should be run in parallel.}
 
