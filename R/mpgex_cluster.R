@@ -96,7 +96,7 @@ mpgex_cluster <- function(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
     basis <- rbf.object(M = 3)
   }
   if (is.null(w)){
-    w <- rep(0.5, basis$M + 1)
+    w <- rep(0.1, basis$M + 1)
 
     # Optimize the BPR function for each element in x
     out_opt <- bpr_optim(x           = x,

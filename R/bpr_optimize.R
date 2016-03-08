@@ -262,7 +262,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
     basis <- rbf.object(M = 3)
   }
   if (is.null(w)){
-    w <- rep(0.5, basis$M + 1)
+    w <- rep(0.1, basis$M + 1)
   }
   if (length(w) != (basis$M + 1) ){
     stop("Coefficients vector should be M+1, M: number of basis functions!")
