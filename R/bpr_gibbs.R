@@ -90,10 +90,10 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   }
 
   if (is.null(w_0_cov)){
-    w_0_cov <- diag(4, length(w))
+    w_0_cov <- diag(2, length(w))
   }else{
     if (length(w) != NROW(w_0_cov)){
-      w_0_cov <- diag(4, length(w))
+      w_0_cov <- diag(2, length(w))
     }
   }
 
