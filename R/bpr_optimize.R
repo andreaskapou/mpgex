@@ -239,7 +239,7 @@ bpr_optim.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
     }else if (identical(fit_feature, "RMSE")){
       # Predictions of the target variables
       f_pred <- as.vector(pnorm(H %*% w_opt))
-      f_true <- data[,2] / data[, 1]
+      f_true <- data[ ,2] / data[ ,1]
       fit <- sqrt(mean( (f_pred - f_true) ^ 2) )
     }
     w_opt <- c(w_opt, fit)
