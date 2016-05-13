@@ -5,5 +5,8 @@
 #'
 #' @docType package
 #' @name mpgex
+#'
+#' @importFrom stats cor
+#' @importFrom graphics axis lines mtext par plot
 NULL
 #> NULL
