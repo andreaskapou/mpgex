@@ -42,6 +42,39 @@ plot.rbf <- function(x, obs, w, ...){
 }
 
 
+#' Plot fit of methylation profiles across a region
+#'
+#' @param region Promoter region number
+#' @param X Methylation data observations
+#' @param fit_prof Fitted profiles
+#' @param fit_mean Fitted mean function
+#' @param title Title of the plot
+#' @param ... Additional parameters
+#'
+#' @export
+plot_fitted_profiles <- function(region, X, fit_prof, fit_mean = NULL,
+                                 title = "Gene promoter", ...){
+
+  par(cex=1.05, mai=c(1.37,1.37,.7,.3) )
+  x <- X[[region]][,1]
+  y <- X[[region]][,3]/X[[region]][,2]
+  xs <- seq(from = -1, to = 1, by = 0.01)
+  plot(x, y, col = "blue2", pch = 21, ylim = c(0,1), xlim = c(-1,1), lwd = 0.8,
+       xlab = NA, ylab = NA, cex.axis = 1.1, xaxt = "n")
+  mtext(side = 1, "genomic region", line = 3, cex = 1.2)
+  mtext(side = 2, "methylation level", line = 3, cex = 1.2)
+  axis(side = 1, at = c(-1, 0, 1), labels=c("-7kb", "TSS", "+7kb"))
+  title(main=title, line = 1, cex.main=1.4)
+  if(!is.null(fit_mean)){
+    lines(x = xs,
+          y = eval_probit_function(fit_mean$basis, xs, fit_mean$W_opt[region, ]),
+          col = 'coral', lwd = 2, lty = 2)
+  }
+  lines(x = xs,
+        y = eval_probit_function(fit_prof$basis, xs, fit_prof$W_opt[region, ]),
+        col = 'red2', lwd = 2)
+}
+
 #' Plot method for differential methylation
 #'
 #' Plot data using the differntial methylation data
