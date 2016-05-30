@@ -30,6 +30,12 @@
 #' @param w_0_cov The prior covariance hyperparameter for w
 #' @param gibbs_nsim Optional argument giving the number of simulations of the
 #'  Gibbs sampler.
+#' @param gibbs_burn_in Optional argument giving the burn in period of the
+#'  Gibbs sampler.
+#' @param opt_method Parameter for defining the method to be used in the
+#'  optimization procedure, see \code{\link[stats]{optim}}.
+#' @param opt_itnmax Optional parameter for defining the max number of
+#'  iterations of the optimization procedure, see \code{\link[stats]{optim}}.
 #' @param is_parallel Logical, indicating if code should be run in parallel.
 #' @param no_cores Number of cores to be used, default is max_no_cores - 1.
 #' @param is_summary Logical, print the summary statistics.
@@ -45,28 +51,42 @@
 #' y   <- gex_data
 #' basis <- rbf.object(M = 5)
 #' out   <- mpgex_regr_bayes(x = obs, y = y, basis = basis, is_parallel = FALSE,
-#'                     gibbs_nsim = 100)
+#'                     gibbs_nsim = 100, gibbs_burn_in = 10)
 #'
 #' @export
 mpgex_regr_bayes <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
                        basis = NULL, train_ind = NULL, train_perc = 0.7,
                        fit_feature = NULL, cpg_dens_feat = FALSE,
-                       w_0_mean = NULL, w_0_cov = NULL, gibbs_nsim = 300,
+                       w_0_mean = NULL, w_0_cov = NULL, gibbs_nsim = 5000,
+                       gibbs_burn_in = 1000, opt_method = "CG", opt_itnmax = 50,
                        is_parallel = TRUE, no_cores = NULL, is_summary = TRUE){
 
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
 
-  # Learn methylation profiles for each gene promoter region
   message("Learning methylation profiles ...\n")
-  out_opt <- bpr_gibbs(x           = x,
+  # Compute regression coefficients for each region using MLE
+  out_mle <- bpr_optim(x           = x,
                        w           = w,
                        basis       = basis,
+                       fit_feature = fit_feature,
+                       cpg_dens_feat = cpg_dens_feat,
+                       opt_method  = opt_method,
+                       opt_itnmax  = opt_itnmax,
+                       is_parallel = is_parallel,
+                       no_cores    = no_cores)
+
+
+  # Learn methylation profiles for each gene promoter region
+  out_opt <- bpr_gibbs(x           = x,
+                       w_mle       = out_mle$W_opt,
+                       basis       = out_mle$basis,
                        fit_feature = fit_feature,
                        cpg_dens_feat = cpg_dens_feat,
                        w_0_mean    = w_0_mean,
                        w_0_cov     = w_0_cov,
                        gibbs_nsim  = gibbs_nsim,
+                       gibbs_burn_in = gibbs_burn_in,
                        is_parallel = is_parallel,
                        no_cores    = no_cores)
 

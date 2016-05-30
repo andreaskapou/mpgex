@@ -36,8 +36,10 @@ bpr_gibbs.default <- function(x, ...){
 #'  matrix of observations, where 1st column contains the locations. The 2nd
 #'  and 3rd columns contain the total trials and number of successes at the
 #'  corresponding locations, repsectively.
+#' @param w_mle A matrix of MLE estimates for the regression coefficients for
+#'  each genomic region of interest.
 #' @param is_parallel Logical, indicating if code should be run in parallel.
-#' @param no_cores Number of cores to be used, default is max_no_cores - 1.
+#' @param no_cores Number of cores to be used, default is max_no_cores - 2.
 #' @inheritParams bpr_gibbs.matrix
 #'
 #' @return A list containing the following elements:
@@ -65,9 +67,9 @@ bpr_gibbs.default <- function(x, ...){
 #' out_opt <- bpr_gibbs(x = ex_data, is_parallel = FALSE, basis = basis)
 #'
 #' @export
-bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
+bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
                            cpg_dens_feat = FALSE, w_0_mean = NULL,
-                           w_0_cov = NULL, gibbs_nsim = 100,
+                           w_0_cov = NULL, gibbs_nsim = 100, gibbs_burn_in = 10,
                            is_parallel = TRUE, no_cores = NULL, ...){
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
@@ -77,23 +79,29 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   assertthat::assert_that(N > 0)
 
   # Perform checks for initial parameter values
-  out <- .do_checks(w = w, basis = basis)
+  out <- .do_checks_bpr_gibbs(w = w_mle, basis = basis)
   w   <- out$w
   basis <- out$basis
 
-  if (is.null(w_0_mean)){
-    w_0_mean <- rep(0, length(w))
-  }else{
-    if (length(w) != length(w_0_mean)){
-      w_0_mean <- rep(0, length(w))
-    }
+  # Number of coefficients
+  D <- basis$M + 1
+
+  if (is.vector(w)){
+    w <- matrix(w, ncol = D, nrow = N, byrow = TRUE)
   }
 
-  if (is.null(w_0_cov)){
-    w_0_cov <- diag(1, length(w))
+  if (is.null(w_0_mean)){
+    w_0_mean <- rep(0, D)
   }else{
-    if (length(w) != NROW(w_0_cov)){
-      w_0_cov <- diag(1, length(w))
+    if (length(w_0_mean) != D){
+      w_0_mean <- rep(0, D)
+    }
+  }
+  if (is.null(w_0_cov)){
+    w_0_cov <- diag(1, D)
+  }else{
+    if (NROW(w_0_cov) != D){
+      w_0_cov <- diag(1, D)
     }
   }
 
@@ -121,13 +129,14 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
     res <- foreach::"%dopar%"(obj = foreach::foreach(i = 1:N),
                   ex  = {
                     out_opt <- bpr_gibbs.matrix(x           = x[[i]],
-                                                w           = w,
+                                                w_mle       = w[i, ],
                                                 basis       = basis,
                                                 fit_feature = fit_feature,
                                                 cpg_dens_feat = cpg_dens_feat,
                                                 w_0_mean    = w_0_mean,
                                                 w_0_cov     = w_0_cov,
-                                                gibbs_nsim  = gibbs_nsim)
+                                                gibbs_nsim  = gibbs_nsim,
+                                                gibbs_burn_in = gibbs_burn_in)
                               })
     # Stop parallel execution
     parallel::stopCluster(cl)
@@ -136,13 +145,14 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
     res <- foreach::"%do%"(obj = foreach::foreach(i = 1:N),
                  ex  = {
                    out_opt <- bpr_gibbs.matrix(x           = x[[i]],
-                                               w           = w,
+                                               w_mle       = w_mle[i, ],
                                                basis       = basis,
                                                fit_feature = fit_feature,
                                                cpg_dens_feat = cpg_dens_feat,
                                                w_0_mean    = w_0_mean,
                                                w_0_cov     = w_0_cov,
-                                               gibbs_nsim  = gibbs_nsim)
+                                               gibbs_nsim  = gibbs_nsim,
+                                               gibbs_burn_in = gibbs_burn_in)
                  })
   }
 
@@ -189,7 +199,8 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' @param x An L x 3 matrix of observations, where 1st column contains the
 #'  locations. The 2nd and 3rd columns contain the total trials and number of
 #'  successes at the corresponding locations, repsectively.
-#' @param w A vector of parameters (i.e. coefficients of the basis functions)
+#' @param w_mle A vector of parameters (i.e. coefficients of the basis functions)
+#'  containing the MLE estimates.
 #' @param basis A 'basis' object. See \code{\link{polynomial.object}}
 #' @param fit_feature Additional feature on how well the profile fits the
 #'  methylation data.
@@ -198,6 +209,8 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' @param w_0_mean The prior mean hyperparameter for w
 #' @param w_0_cov The prior covariance hyperparameter for w
 #' @param gibbs_nsim Optional argument giving the number of simulations of the
+#'  Gibbs sampler.
+#' @param gibbs_burn_in Optional argument giving the burn in period of the
 #'  Gibbs sampler.
 #' @param ... Additional parameters
 #'
@@ -218,7 +231,7 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' w_0_mean <- rep(0, length(w))
 #' w_0_cov <- diag(10, length(w))
 #' data <- bpr_data[[1]]
-#' out_opt <- bpr_gibbs(x = data, w = w, w_0_mean = w_0_mean,
+#' out_opt <- bpr_gibbs(x = data, w_mle = w, w_0_mean = w_0_mean,
 #'                      w_0_cov = w_0_cov, basis = basis)
 #'
 #' basis <- polynomial.object(M=0)
@@ -226,7 +239,7 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' w_0_mean <- rep(0, length(w))
 #' w_0_cov <- diag(10, length(w))
 #' data <- bpr_data[[1]]
-#' out_opt <- bpr_gibbs(x = data, w = w, w_0_mean = w_0_mean,
+#' out_opt <- bpr_gibbs(x = data, w_mle = w, w_0_mean = w_0_mean,
 #'                      w_0_cov = w_0_cov, basis = basis)
 #'
 #' @importFrom stats optim
@@ -234,9 +247,10 @@ bpr_gibbs.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 #' @importFrom mvtnorm rmvnorm
 #'
 #' @export
-bpr_gibbs.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
+bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
                              cpg_dens_feat = FALSE, w_0_mean = NULL,
-                             w_0_cov = NULL, gibbs_nsim = 100, ...){
+                             w_0_cov = NULL, gibbs_nsim = 100,
+                             gibbs_burn_in = 10, ...){
 
   # Vector for storing CpG locations relative to TSS
   obs <- as.vector(x[ ,1])
@@ -246,51 +260,89 @@ bpr_gibbs.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
   H       <- des_mat$H
   basis   <- des_mat$basis
 
+  D <- basis$M + 1
+
   # Total number of reads for each CpG
-  N_i     <- as.vector(x[,2])
+  N_i <- as.vector(x[, 2])
   # Corresponding number of methylated reads for each CpG
-  y_star  <- as.vector(x[,3])
+  m_i <- as.vector(x[, 3])
 
-  z <- rep(0, sum(N_i))				   # Latent Normal Variable
+  # Sum of total trials for each observation i
+  J <- sum(N_i)
+
+  # Create extended vector y of length (J x 1)
   y <- vector(mode = "integer")
-  for (i in 1:length(y_star)){
-    y <- c(y, rep(1, y_star[i]), rep(0, N_i[i] - y_star[i]))
+  for (i in 1:NROW(x)){
+    y <- c(y, rep(1, m_i[i]), rep(0, N_i[i] - m_i[i]))
   }
 
-  N <- sum(N_i)
-  n1  <- sum(y)   # Number of successes
-  n0  <- N - n1   # Number of failures
+  N1  <- sum(y)  # Number of successes
+  N0  <- J - N1  # Number of failures
 
-  # Create concatenated matrix of observations
-  rows <- rep(1:nrow(H), N_i)
-  H <- as.matrix(H[rows, ])
+  # Create extended design matrix Xx of dimension (J x D)
+  H <- as.matrix(H[rep(1:NROW(H), N_i), ])
 
-  # Store Results
-  w_samples <- matrix(0, nrow = gibbs_nsim, ncol = length(w))
-
-  # Start Gibbs sampler
-  prec_W_0 <- solve(w_0_cov)
-  W_cov <- solve(prec_W_0 + crossprod(H, H))
-
-  for (tt in 2:gibbs_nsim) {
-    # Draw Latent Variable, z, from its full conditional, given y
-    mus <- H %*% w			# Update Mean of Z
-
-    # Using truncated normal function
-    z[y==0] <- rtruncnorm(n = n0, mean = mus[y==0], sd = 1, a = -Inf, b = 0)
-    z[y==1] <- rtruncnorm(n = n1, mean = mus[y==1], sd = 1, a = 0, b = Inf)
-
-    # Posterior mean of w|Z
-    w_mean <- W_cov %*% (prec_W_0 %*% w_0_mean + crossprod(H, z))
-    w_samples[tt, ] <- w <- c(rmvnorm(1, w_mean, as.matrix(W_cov)))
-  }
-
-  # Keep summary statistic and get the mean of the Gibbs samples
-  if (NCOL(w_samples) == 1){
-    w_opt <- mean(w_samples[(ceiling(gibbs_nsim/4)):gibbs_nsim, ])
+  # Conjugate prior on the coefficients \w ~ N(w_0_mean, w_0_cov)
+  if (is.null(w_0_mean)){
+    w_0_mean <- rep(0, D)
   }else{
-    w_opt <- as.vector(apply(w_samples[(ceiling(gibbs_nsim/4)):gibbs_nsim, ],
-                             2, mean))
+    if (length(w_0_mean) != D){
+      w_0_mean <- rep(0, D)
+    }
+  }
+  if (is.null(w_0_cov)){
+    w_0_cov <- diag(1, D)
+  }else{
+    if (NROW(w_0_cov) != D){
+      w_0_cov <- diag(1, D)
+    }
+  }
+  # Initialize regression coefficients
+  if (is.null(w_mle)){
+    w_mle <- rep(0, D)
+  }
+
+  # Matrix storing samples of the \w parameter
+  w_chain <- matrix(0, nrow = gibbs_nsim, ncol = D)
+  w_chain[1, ] <- w_mle
+
+  # Compute posterior variance of w
+  prec_0 <- solve(w_0_cov)
+  V <- solve(prec_0 + crossprod(H, H))
+
+  # Initialize latent variable Z, from truncated normal
+  z <- rep(0, J)
+  z[y == 0] <- rtruncnorm(N0, mean = 0, sd = 1, a = -Inf, b = 0)
+  z[y == 1] <- rtruncnorm(N1, mean = 0, sd = 1, a = 0, b = Inf)
+
+  for (t in 2:gibbs_nsim) {
+    # Compute posterior mean of w
+    M <- V %*% (prec_0 %*% w_0_mean + crossprod(H, z))
+    # Draw variable \w from its full conditional: \w | z, X
+    w <- c(rmvnorm(1, M, V))
+
+    # Update Mean of z
+    mu_z <- H %*% w
+    # Draw latent variable z from its full conditional: z | \w, y, X
+    z[y == 0] <- rtruncnorm(N0, mean = mu_z[y == 0], sd = 1, a = -Inf, b = 0)
+    z[y == 1] <- rtruncnorm(N1, mean = mu_z[y == 1], sd = 1, a = 0, b = Inf)
+
+    # Store the \theta draws
+    w_chain[t, ] <- w
+  }
+
+#   # Keep summary statistic and get the mean of the Gibbs samples
+#   if (NCOL(w_chain) == 1){
+#     w_opt <- mean(w_samples[(ceiling(gibbs_nsim/4)):gibbs_nsim, ])
+#   }else{
+#     w_opt <- as.vector(apply(w_samples[(ceiling(gibbs_nsim/4)):gibbs_nsim, ],
+#                              2, mean))
+#   }
+
+  if (D == 1){
+    w_opt <- mean(w_chain[-(1:gibbs_burn_in)])
+  }else{
+    w_opt <- colMeans(w_chain[-(1:gibbs_burn_in), ])
   }
 
   # If we need to add the goodness of fit to the data as feature
@@ -321,15 +373,21 @@ bpr_gibbs.matrix <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
 
 
 # Internal function to make all the appropriate type checks.
-.do_checks <- function(w = NULL, basis = NULL){
+.do_checks_bpr_gibbs <- function(w = NULL, basis = NULL){
   if (is.null(basis)){
     basis <- rbf.object(M = 3)
   }
   if (is.null(w)){
     w <- rep(0.5, basis$M + 1)
   }
-  if (length(w) != (basis$M + 1) ){
-    stop("Coefficients vector should be M+1, M: number of basis functions!")
+  if (is.matrix(w)){
+    if (length(w[1,]) != (basis$M + 1) ){
+      stop("Coefficients vector should be M+1, M: number of basis functions!")
+    }
+  }else{
+    if (length(w) != (basis$M + 1) ){
+      stop("Coefficients vector should be M+1, M: number of basis functions!")
+    }
   }
   return(list(w = w, basis = basis))
 }

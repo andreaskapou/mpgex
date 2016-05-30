@@ -7,7 +7,8 @@
 mpgex_regr_bayes(formula = NULL, x, y, model_name = "svm", w = NULL,
   basis = NULL, train_ind = NULL, train_perc = 0.7, fit_feature = NULL,
   cpg_dens_feat = FALSE, w_0_mean = NULL, w_0_cov = NULL,
-  gibbs_nsim = 300, is_parallel = TRUE, no_cores = NULL,
+  gibbs_nsim = 5000, gibbs_burn_in = 1000, opt_method = "CG",
+  opt_itnmax = 50, is_parallel = TRUE, no_cores = NULL,
   is_summary = TRUE)
 }
 \arguments{
@@ -46,6 +47,15 @@ promoter region.}
 \item{gibbs_nsim}{Optional argument giving the number of simulations of the
 Gibbs sampler.}
 
+\item{gibbs_burn_in}{Optional argument giving the burn in period of the
+Gibbs sampler.}
+
+\item{opt_method}{Parameter for defining the method to be used in the
+optimization procedure, see \code{\link[stats]{optim}}.}
+
+\item{opt_itnmax}{Optional parameter for defining the max number of
+iterations of the optimization procedure, see \code{\link[stats]{optim}}.}
+
 \item{is_parallel}{Logical, indicating if code should be run in parallel.}
 
 \item{no_cores}{Number of cores to be used, default is max_no_cores - 1.}
@@ -69,7 +79,7 @@ obs <- bpr_data
 y   <- gex_data
 basis <- rbf.object(M = 5)
 out   <- mpgex_regr_bayes(x = obs, y = y, basis = basis, is_parallel = FALSE,
-                    gibbs_nsim = 100)
+                    gibbs_nsim = 100, gibbs_burn_in = 10)
 
 }
 \seealso{

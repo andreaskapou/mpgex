@@ -4,16 +4,17 @@
 \alias{bpr_gibbs.matrix}
 \title{Gibbs sampling for the BPR model using list x}
 \usage{
-\method{bpr_gibbs}{matrix}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  cpg_dens_feat = FALSE, w_0_mean = NULL, w_0_cov = NULL,
-  gibbs_nsim = 100, ...)
+\method{bpr_gibbs}{matrix}(x, w_mle = NULL, basis = NULL,
+  fit_feature = NULL, cpg_dens_feat = FALSE, w_0_mean = NULL,
+  w_0_cov = NULL, gibbs_nsim = 100, gibbs_burn_in = 10, ...)
 }
 \arguments{
 \item{x}{An L x 3 matrix of observations, where 1st column contains the
 locations. The 2nd and 3rd columns contain the total trials and number of
 successes at the corresponding locations, repsectively.}
 
-\item{w}{A vector of parameters (i.e. coefficients of the basis functions)}
+\item{w_mle}{A vector of parameters (i.e. coefficients of the basis functions)
+containing the MLE estimates.}
 
 \item{basis}{A 'basis' object. See \code{\link{polynomial.object}}}
 
@@ -28,6 +29,9 @@ promoter region.}
 \item{w_0_cov}{The prior covariance hyperparameter for w}
 
 \item{gibbs_nsim}{Optional argument giving the number of simulations of the
+Gibbs sampler.}
+
+\item{gibbs_burn_in}{Optional argument giving the burn in period of the
 Gibbs sampler.}
 
 \item{...}{Additional parameters}
@@ -53,7 +57,7 @@ w <- c(0.1, 0.1, 0.1)
 w_0_mean <- rep(0, length(w))
 w_0_cov <- diag(10, length(w))
 data <- bpr_data[[1]]
-out_opt <- bpr_gibbs(x = data, w = w, w_0_mean = w_0_mean,
+out_opt <- bpr_gibbs(x = data, w_mle = w, w_0_mean = w_0_mean,
                      w_0_cov = w_0_cov, basis = basis)
 
 basis <- polynomial.object(M=0)
@@ -61,7 +65,7 @@ w <- c(0.1)
 w_0_mean <- rep(0, length(w))
 w_0_cov <- diag(10, length(w))
 data <- bpr_data[[1]]
-out_opt <- bpr_gibbs(x = data, w = w, w_0_mean = w_0_mean,
+out_opt <- bpr_gibbs(x = data, w_mle = w, w_0_mean = w_0_mean,
                      w_0_cov = w_0_cov, basis = basis)
 
 }

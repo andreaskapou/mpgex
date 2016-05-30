@@ -4,9 +4,10 @@
 \alias{bpr_gibbs.list}
 \title{Gibbs sampling for the BPR model using list x}
 \usage{
-\method{bpr_gibbs}{list}(x, w = NULL, basis = NULL, fit_feature = NULL,
-  cpg_dens_feat = FALSE, w_0_mean = NULL, w_0_cov = NULL,
-  gibbs_nsim = 100, is_parallel = TRUE, no_cores = NULL, ...)
+\method{bpr_gibbs}{list}(x, w_mle = NULL, basis = NULL,
+  fit_feature = NULL, cpg_dens_feat = FALSE, w_0_mean = NULL,
+  w_0_cov = NULL, gibbs_nsim = 100, gibbs_burn_in = 10,
+  is_parallel = TRUE, no_cores = NULL, ...)
 }
 \arguments{
 \item{x}{A list of elements of length N, where each element is an L x 3
@@ -14,7 +15,8 @@ matrix of observations, where 1st column contains the locations. The 2nd
 and 3rd columns contain the total trials and number of successes at the
 corresponding locations, repsectively.}
 
-\item{w}{A vector of parameters (i.e. coefficients of the basis functions)}
+\item{w_mle}{A matrix of MLE estimates for the regression coefficients for
+each genomic region of interest.}
 
 \item{basis}{A 'basis' object. See \code{\link{polynomial.object}}}
 
@@ -31,9 +33,12 @@ promoter region.}
 \item{gibbs_nsim}{Optional argument giving the number of simulations of the
 Gibbs sampler.}
 
+\item{gibbs_burn_in}{Optional argument giving the burn in period of the
+Gibbs sampler.}
+
 \item{is_parallel}{Logical, indicating if code should be run in parallel.}
 
-\item{no_cores}{Number of cores to be used, default is max_no_cores - 1.}
+\item{no_cores}{Number of cores to be used, default is max_no_cores - 2.}
 
 \item{...}{Additional parameters}
 }
