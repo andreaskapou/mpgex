@@ -77,12 +77,11 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   # Extract number of observations
   N <- length(x)
   assertthat::assert_that(N > 0)
-  print(w_mle)
+
   # Perform checks for initial parameter values
   out <- .do_checks_bpr_gibbs(w = w_mle, basis = basis)
   w   <- out$w
   basis <- out$basis
-  print(w)
 
   # Number of coefficients
   D <- basis$M + 1
@@ -382,9 +381,6 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
     w <- rep(0.5, basis$M + 1)
   }
   if (is.matrix(w)){
-    print(w[1,])
-    print("\n")
-    print(length(w[1,]))
     if (length(w[1,]) != (basis$M + 1) ){
       stop("Coefficients vector should be M+1!")
     }
