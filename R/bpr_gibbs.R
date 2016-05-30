@@ -77,7 +77,7 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   # Extract number of observations
   N <- length(x)
   assertthat::assert_that(N > 0)
-
+  message(w_mle)
   # Perform checks for initial parameter values
   out <- .do_checks_bpr_gibbs(w = w_mle, basis = basis)
   w   <- out$w
