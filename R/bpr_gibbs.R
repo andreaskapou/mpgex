@@ -79,9 +79,10 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   assertthat::assert_that(N > 0)
 
   # Perform checks for initial parameter values
-  out <- .do_checks_bpr_gibbs(w = w_mle, basis = basis)
-  w   <- out$w
-  basis <- out$basis
+  #out <- .do_checks_bpr_gibbs(w = w_mle, basis = basis)
+  #w   <- out$w
+  #basis <- out$basis
+  w <- w_mle
 
   # Number of coefficients
   D <- basis$M + 1
@@ -145,7 +146,7 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
     res <- foreach::"%do%"(obj = foreach::foreach(i = 1:N),
                  ex  = {
                    out_opt <- bpr_gibbs.matrix(x           = x[[i]],
-                                               w_mle       = w_mle[i, ],
+                                               w_mle       = w[i, ],
                                                basis       = basis,
                                                fit_feature = fit_feature,
                                                cpg_dens_feat = cpg_dens_feat,
