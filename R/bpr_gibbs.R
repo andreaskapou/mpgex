@@ -382,7 +382,7 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   }
   if (is.matrix(w)){
     if (length(w[1,]) != (basis$M + 1) ){
-      stop("Coefficients vector should be M+1, M: number of basis functions!")
+      stop("Coefficients vector should be M+1!")
     }
   }else{
     if (length(w) != (basis$M + 1) ){
