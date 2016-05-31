@@ -80,14 +80,14 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
 
   # Perform checks for initial parameter values
   out <- .do_checks_bpr_gibbs(w = w_mle, basis = basis)
-  w   <- out$w
+  w_mle   <- out$w
   basis <- out$basis
 
   # Number of coefficients
   D <- basis$M + 1
 
-  if (is.vector(w)){
-    w <- matrix(w, ncol = D, nrow = N, byrow = TRUE)
+  if (is.vector(w_mle)){
+    w_mle <- matrix(w_mle, ncol = D, nrow = N, byrow = TRUE)
   }
 
   if (is.null(w_0_mean)){
@@ -129,7 +129,7 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
     res <- foreach::"%dopar%"(obj = foreach::foreach(i = 1:N),
                   ex  = {
                     out_opt <- bpr_gibbs.matrix(x           = x[[i]],
-                                                w_mle       = w[i, ],
+                                                w_mle       = w_mle[i, ],
                                                 basis       = basis,
                                                 fit_feature = fit_feature,
                                                 cpg_dens_feat = cpg_dens_feat,
@@ -145,7 +145,7 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
     res <- foreach::"%do%"(obj = foreach::foreach(i = 1:N),
                  ex  = {
                    out_opt <- bpr_gibbs.matrix(x           = x[[i]],
-                                               w_mle       = w[i, ],
+                                               w_mle       = w_mle[i, ],
                                                basis       = basis,
                                                fit_feature = fit_feature,
                                                cpg_dens_feat = cpg_dens_feat,
@@ -306,6 +306,10 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   w_chain <- matrix(0, nrow = gibbs_nsim, ncol = D)
   w_chain[1, ] <- w_mle
 
+  # ---------------------------------
+  # Gibbs sampling algorithm
+  # ---------------------------------
+  
   # Compute posterior variance of w
   prec_0 <- solve(w_0_cov)
   V <- solve(prec_0 + crossprod(H, H))
