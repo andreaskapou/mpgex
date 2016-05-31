@@ -185,7 +185,7 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   return(list(W_opt = W_opt,
               Mus = Mus,
               basis = basis,
-              w = w,
+              w = w_mle,
               x_extrema = x_extrema))
 }
 
@@ -309,7 +309,7 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   # ---------------------------------
   # Gibbs sampling algorithm
   # ---------------------------------
-  
+
   # Compute posterior variance of w
   prec_0 <- solve(w_0_cov)
   V <- solve(prec_0 + crossprod(H, H))
