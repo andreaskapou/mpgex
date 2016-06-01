@@ -69,7 +69,7 @@ y   <- list(control = gex_control_data, treatment = gex_treatment_data)
 basis <- rbf.object(M = 3)
 set.seed(1234)
 out   <- mpgex_differential_regr(x = obs, y = y, basis = basis,
-                                 is_parallel = FALSE, opt_itnmax = 50)
+                                 is_parallel = FALSE, opt_itnmax = 5)
 
 }
 \seealso{

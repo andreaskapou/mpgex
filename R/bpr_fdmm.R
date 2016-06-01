@@ -132,7 +132,8 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     ext_des_mat[[i]] <- as.matrix(des_mat[[i]][rep(1:NROW(des_mat[[i]]),
                                                    N_i), ])
   }
-  rm(des_mat)
+
+  # TODO: Keep only one design matrix PROBABLE MEMORY ISSUE
 
   # Run Gibbs sampling
   for (t in 2:gibbs_nsim){

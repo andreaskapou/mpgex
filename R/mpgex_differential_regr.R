@@ -29,7 +29,7 @@
 #' basis <- rbf.object(M = 3)
 #' set.seed(1234)
 #' out   <- mpgex_differential_regr(x = obs, y = y, basis = basis,
-#'                                  is_parallel = FALSE, opt_itnmax = 50)
+#'                                  is_parallel = FALSE, opt_itnmax = 5)
 #'
 #' @export
 mpgex_differential_regr <- function(formula = NULL, x, y, model_name = "svm",

@@ -12,8 +12,8 @@
 #'
 #' @examples
 #' ex_data <- bpr_data
-#' mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 5, is_parallel = FALSE,
-#'                              opt_itnmax = 10)
+#' mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 2, is_parallel = FALSE,
+#'                              opt_itnmax = 5)
 #'
 #' @export
 mpgex_cluster <- function(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
@@ -57,7 +57,7 @@ mpgex_cluster <- function(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
                   no_cores    = no_cores,
                   is_verbose = is_verbose)
   message("Done!\n\n")
-  
+
   # Add names to the estimated parameters for clarity
   names(mpgex$pi_k) <- paste0("clust", 1:K)
   colnames(mpgex$w) <- paste0("clust", 1:K)
@@ -81,7 +81,7 @@ mpgex_cluster <- function(x, K = 3, pi_k = NULL, w = NULL, basis = NULL,
   entropy <- (-1) * sum(mpgex$post_prob * log(mpgex$post_prob),
                         na.rm = TRUE)
   mpgex$ICL <- mpgex$BIC + entropy
-  
+
   # Store initial max optimization iterations
   mpgex$init_opt_itnmax <- init_opt_itnmax
 

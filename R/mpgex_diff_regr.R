@@ -34,7 +34,7 @@
 #' basis <- rbf.object(M = 3)
 #' set.seed(1234)
 #' out   <- mpgex_diff_regr(x = obs, y = y, basis = basis, is_parallel = FALSE,
-#'                          opt_itnmax = 50, lambda = 1e-02)
+#'                          opt_itnmax = 5, lambda = 1e-02)
 #'
 #' @export
 mpgex_diff_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,

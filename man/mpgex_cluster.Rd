@@ -52,8 +52,8 @@ metrics are calculated, such as BIC and AIC.
 }
 \examples{
 ex_data <- bpr_data
-mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 5, is_parallel = FALSE,
-                             opt_itnmax = 10)
+mpgex_clust <- mpgex_cluster(x = ex_data, em_max_iter = 2, is_parallel = FALSE,
+                             opt_itnmax = 5)
 
 }
 

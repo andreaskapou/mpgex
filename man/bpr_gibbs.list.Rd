@@ -6,7 +6,7 @@
 \usage{
 \method{bpr_gibbs}{list}(x, w_mle = NULL, basis = NULL,
   fit_feature = NULL, cpg_dens_feat = FALSE, w_0_mean = NULL,
-  w_0_cov = NULL, gibbs_nsim = 100, gibbs_burn_in = 10,
+  w_0_cov = NULL, gibbs_nsim = 20, gibbs_burn_in = 10,
   is_parallel = TRUE, no_cores = NULL, ...)
 }
 \arguments{

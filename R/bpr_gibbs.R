@@ -69,7 +69,7 @@ bpr_gibbs.default <- function(x, ...){
 #' @export
 bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
                            cpg_dens_feat = FALSE, w_0_mean = NULL,
-                           w_0_cov = NULL, gibbs_nsim = 100, gibbs_burn_in = 10,
+                           w_0_cov = NULL, gibbs_nsim = 20, gibbs_burn_in = 10,
                            is_parallel = TRUE, no_cores = NULL, ...){
   # Check that x is a list object
   assertthat::assert_that(is.list(x))
@@ -249,7 +249,7 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
 #' @export
 bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
                              cpg_dens_feat = FALSE, w_0_mean = NULL,
-                             w_0_cov = NULL, gibbs_nsim = 100,
+                             w_0_cov = NULL, gibbs_nsim = 20,
                              gibbs_burn_in = 10, ...){
 
   # Vector for storing CpG locations relative to TSS

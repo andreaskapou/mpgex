@@ -79,7 +79,7 @@ obs <- bpr_data
 y   <- gex_data
 basis <- rbf.object(M = 5)
 out   <- mpgex_regr_bayes(x = obs, y = y, basis = basis, is_parallel = FALSE,
-                    gibbs_nsim = 100, gibbs_burn_in = 10)
+                    gibbs_nsim = 20, gibbs_burn_in = 10)
 
 }
 \seealso{
