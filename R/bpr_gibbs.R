@@ -84,24 +84,24 @@ bpr_gibbs.list <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   basis <- out$basis
 
   # Number of coefficients
-  D <- basis$M + 1
+  M <- basis$M + 1
 
   if (is.vector(w_mle)){
-    w_mle <- matrix(w_mle, ncol = D, nrow = N, byrow = TRUE)
+    w_mle <- matrix(w_mle, ncol = M, nrow = N, byrow = TRUE)
   }
 
   if (is.null(w_0_mean)){
-    w_0_mean <- rep(0, D)
+    w_0_mean <- rep(0, M)
   }else{
-    if (length(w_0_mean) != D){
-      w_0_mean <- rep(0, D)
+    if (length(w_0_mean) != M){
+      w_0_mean <- rep(0, M)
     }
   }
   if (is.null(w_0_cov)){
-    w_0_cov <- diag(1, D)
+    w_0_cov <- diag(1, M)
   }else{
-    if (NROW(w_0_cov) != D){
-      w_0_cov <- diag(1, D)
+    if (NROW(w_0_cov) != M){
+      w_0_cov <- diag(1, M)
     }
   }
 
@@ -260,7 +260,7 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   H       <- des_mat$H
   basis   <- des_mat$basis
 
-  D <- basis$M + 1
+  M <- basis$M + 1
 
   # Total number of reads for each CpG
   N_i <- as.vector(x[, 2])
@@ -279,31 +279,31 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
   N1  <- sum(y)  # Number of successes
   N0  <- J - N1  # Number of failures
 
-  # Create extended design matrix Xx of dimension (J x D)
+  # Create extended design matrix Xx of dimension (J x M)
   H <- as.matrix(H[rep(1:NROW(H), N_i), ])
 
   # Conjugate prior on the coefficients \w ~ N(w_0_mean, w_0_cov)
   if (is.null(w_0_mean)){
-    w_0_mean <- rep(0, D)
+    w_0_mean <- rep(0, M)
   }else{
-    if (length(w_0_mean) != D){
-      w_0_mean <- rep(0, D)
+    if (length(w_0_mean) != M){
+      w_0_mean <- rep(0, M)
     }
   }
   if (is.null(w_0_cov)){
-    w_0_cov <- diag(1, D)
+    w_0_cov <- diag(1, M)
   }else{
-    if (NROW(w_0_cov) != D){
-      w_0_cov <- diag(1, D)
+    if (NROW(w_0_cov) != M){
+      w_0_cov <- diag(1, M)
     }
   }
   # Initialize regression coefficients
   if (is.null(w_mle)){
-    w_mle <- rep(0, D)
+    w_mle <- rep(0, M)
   }
 
   # Matrix storing samples of the \w parameter
-  w_chain <- matrix(0, nrow = gibbs_nsim, ncol = D)
+  w_chain <- matrix(0, nrow = gibbs_nsim, ncol = M)
   w_chain[1, ] <- w_mle
 
   # ---------------------------------
@@ -321,9 +321,9 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
 
   for (t in 2:gibbs_nsim) {
     # Compute posterior mean of w
-    M <- V %*% (prec_0 %*% w_0_mean + crossprod(H, z))
+    Mu <- V %*% (prec_0 %*% w_0_mean + crossprod(H, z))
     # Draw variable \w from its full conditional: \w | z, X
-    w <- c(rmvnorm(1, M, V))
+    w <- c(rmvnorm(1, Mu, V))
 
     # Update Mean of z
     mu_z <- H %*% w
@@ -343,7 +343,7 @@ bpr_gibbs.matrix <- function(x, w_mle = NULL, basis = NULL, fit_feature = NULL,
 #                              2, mean))
 #   }
 
-  if (D == 1){
+  if (M == 1){
     w_opt <- mean(w_chain[-(1:gibbs_burn_in)])
   }else{
     w_opt <- colMeans(w_chain[-(1:gibbs_burn_in), ])

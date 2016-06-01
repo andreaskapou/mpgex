@@ -22,4 +22,5 @@ Imports: assertthat,
     methods,
     stats,
     mvtnorm,
-    truncnorm
+    truncnorm,
+    MCMCpack
