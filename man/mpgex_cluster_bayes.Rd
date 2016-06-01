@@ -54,7 +54,7 @@ metrics are calculated, such as BIC and AIC.
 }
 \examples{
 ex_data <- bpr_data
-mpgex_clust <- mpgex_cluster_bayes(x = ex_data, gibbs_nsim = 50, gibbs_burn_in = 10,
+mpgex_clust <- mpgex_cluster_bayes(x = ex_data, gibbs_nsim = 20, gibbs_burn_in = 10,
                                    is_parallel = FALSE, opt_itnmax = 10)
 
 }
