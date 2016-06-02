@@ -218,26 +218,26 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
       w <- foreach::"%dopar%"(obj = foreach::foreach(k = 1:K,
                                                      .combine = cbind),
                   ex  = {
-                    out <- gibbs_iter_fdmm(w            = w[ ,k],
-                                           C_n          = C_n[, k],
-                                           ext_des_mat  = ext_des_mat,
-                                           data_y       = data_y,
-                                           suc_fail_mat = suc_fail_mat,
-                                           prec_0       = prec_0,
-                                           w_0_prec_0   = w_0_prec_0)
+                    out <- .gibbs_iter_fdmm(w            = w[ ,k],
+                                            C_n          = C_n[, k],
+                                            ext_des_mat  = ext_des_mat,
+                                            data_y       = data_y,
+                                            suc_fail_mat = suc_fail_mat,
+                                            prec_0       = prec_0,
+                                            w_0_prec_0   = w_0_prec_0)
                   })
     }else{
       # Sequential optimization for each clustrer k
       w <- foreach::"%do%"(obj = foreach::foreach(k = 1:K,
                                                   .combine = cbind),
                  ex  = {
-                   out <- gibbs_iter_fdmm(w            = w[ ,k],
-                                          C_n          = C_n[, k],
-                                          ext_des_mat  = ext_des_mat,
-                                          data_y       = data_y,
-                                          suc_fail_mat = suc_fail_mat,
-                                          prec_0       = prec_0,
-                                          w_0_prec_0   = w_0_prec_0)
+                   out <- .gibbs_iter_fdmm(w            = w[ ,k],
+                                           C_n          = C_n[, k],
+                                           ext_des_mat  = ext_des_mat,
+                                           data_y       = data_y,
+                                           suc_fail_mat = suc_fail_mat,
+                                           prec_0       = prec_0,
+                                           w_0_prec_0   = w_0_prec_0)
                  })
     }
     # Store the w draws
@@ -263,7 +263,7 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
 }
 
 
-gibbs_iter_fdmm <- function(w, C_n, ext_des_mat, data_y, suc_fail_mat, prec_0,
+.gibbs_iter_fdmm <- function(w, C_n, ext_des_mat, data_y, suc_fail_mat, prec_0,
                             w_0_prec_0){
   # Which regions are assigned to cluster k
   C_k_idx <- which(C_n == 1)
