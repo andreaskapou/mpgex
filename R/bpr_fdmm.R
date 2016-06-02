@@ -27,6 +27,7 @@
 #'
 #' @importFrom stats rmultinom
 #' @importFrom MCMCpack rdirichlet
+#' @importFrom utils txtProgressBar
 #' @export
 bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                      w_0_mean = NULL, w_0_cov = NULL, dir_a = NULL,
@@ -133,9 +134,10 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                                                    N_i), ])
   }
 
+  # Show progress bar
+  pb <- txtProgressBar(min = 1,max = gibbs_nsim,style = 3)
   # Run Gibbs sampling
   for (t in 2:gibbs_nsim){
-
     ## -----------------------------------------------------------------------
     # Compute weighted pdfs for each cluster
     for (k in 1:K){
@@ -242,7 +244,9 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     }
     # Store the w draws
     w_draws[t, , ] <- w
+    setTxtProgressBar(pb,t)
   }
+  close(pb)
 
   if (is_parallel){
     # Stop parallel execution
