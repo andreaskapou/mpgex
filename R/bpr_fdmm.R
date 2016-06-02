@@ -71,6 +71,8 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   }
   # Invert the matrix
   prec_0 <- solve(w_0_cov)
+  # Compute product of prior mean and prior precision matrix
+  w_0_prec_0 <- prec_0 %*% w_0_mean
 
   # Matrices for storing results
   weighted_pdf <- matrix(0, nrow = N, ncol = K)  # Store weighted PDFs
@@ -80,15 +82,12 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   C_matrix <- matrix(0, nrow = N, ncol = K)  # Total Mixture components
 
   # Mixing Proportions
-  pi_draws <- matrix(0, nrow = gibbs_nsim, ncol = K)
+  pi_draws <- matrix(NA_real_, nrow = gibbs_nsim, ncol = K)
   pi_draws[1, ] <- pi_k
 
   # Array for storing the coefficient draws for each cluster
-  w_draws <- array(data = NA, dim = c(gibbs_nsim, M, K))
-
-  for (k in 1:K){
-    w_draws[1, ,k] <- w[, k]
-  }
+  w_draws <- array(data = NA_real_, dim = c(gibbs_nsim, M, K))
+  w_draws[1, , ] <- w
 
   if (is_parallel){
     # Create design matrix for each observation
@@ -107,8 +106,8 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
   # Auxiliary variable model parameters
   ext_des_mat <- list()
   data_y <- list()
-  # N1 in 1 column, N0 in second column
-  trial_success_mat <- matrix(0, ncol = 2, nrow = N)
+  # N1 in first column, N0 in second column
+  suc_fail_mat <- matrix(NA_integer_, ncol = 2, nrow = N)
 
   # Iterate over each region
   for (i in 1:N){
@@ -119,21 +118,20 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
 
     # Create extended vector y of length (J x 1)
     y <- vector(mode = "integer")
-    for (j in 1:NROW(x[[i]])){
+    for (j in 1:length(N_i)){
       y <- c(y, rep(1, m_i[j]), rep(0, N_i[j] - m_i[j]))
     }
     data_y[[i]] <- y
 
     # Col1: Number of successes
     # Col2: Number of failures
-    trial_success_mat[i, ] <- c(sum(y), sum(N_i) - sum(y))
+    suc_fail_mat[i, ] <- c(sum(y), sum(N_i) - sum(y))
 
+    # TODO: Keep only one design matrix POSSIBLE MEMORY ISSUE
     # Create extended design matrix H of dimension (J x M)
     ext_des_mat[[i]] <- as.matrix(des_mat[[i]][rep(1:NROW(des_mat[[i]]),
                                                    N_i), ])
   }
-
-  # TODO: Keep only one design matrix PROBABLE MEMORY ISSUE
 
   # Run Gibbs sampling
   for (t in 2:gibbs_nsim){
@@ -176,75 +174,74 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     pi_draws[t, ] <- pi_k
 
 
-    ## --------------------------------------------------------------------
-    for (k in 1:K){
-      # Which regions are assigned to cluster k
-      C_k_idx <- which(C_n[, k] == 1)
-
-      # Concatenate data from all regions in cluster k
-      H <- do.call(rbind, ext_des_mat[C_k_idx])
-
-      # Concatenate y from all regions in cluster k
-      y <- do.call(c, data_y[C_k_idx])
-
-      # Add all successes and failures from all regions in cluster k
-      N1_N0 <- colSums(trial_success_mat[C_k_idx, ])
-
-      # Compute posterior variance of w
-      V <- solve(prec_0 + crossprod(H, H))
-
-      # Update Mean of z
-      mu_z <- H %*% w[, k]
-      # Draw latent variable z from its full conditional: z | \w, y, X
-      z <- rep(0, sum(N1_N0))
-      z[y == 1] <- rtruncnorm(N1_N0[1], mean = mu_z[y == 1], sd = 1,
-                              a = 0, b = Inf)
-      z[y == 0] <- rtruncnorm(N1_N0[2], mean = mu_z[y == 0], sd = 1,
-                              a = -Inf, b = 0)
-
-      # Compute posterior mean of w
-      Mu <- V %*% (prec_0 %*% w_0_mean + crossprod(H, z))
-      # Draw variable \w from its full conditional: \w | z, X
-      w[, k] <- c(rmvnorm(1, Mu, V))
-
-      # Store the \theta draws
-      w_draws[t, , k] <- w[, k]
-    }
-
-
-#     # Update basis function coefficient vector w for each cluster
-#     # If parallel mode is ON
-#     if (is_parallel){
-#       # Parallel optimization for each cluster k
-#       w <- foreach::"%dopar%"(obj = foreach::foreach(k = 1:K,
-#                                                      .combine = cbind),
-#                               ex  = {
-#                                 out <- gibbs_bpr(par       = w[ ,k],
-#                                              fn        = sum_weighted_bpr_lik,
-#                                              gr        = sum_weighted_bpr_grad,
-#                                              method    = opt_method,
-#                                              control   = list(maxit = opt_itnmax),
-#                                              x         = x,
-#                                              des_mat   = des_mat,
-#                                              post_prob = post_prob[ ,k],
-#                                              is_NLL    = TRUE)
-#                               })
-#     }else{
-#       # Sequential optimization for each clustrer k
-#       w <- foreach::"%do%"(obj = foreach::foreach(k = 1:K,
-#                                                   .combine = cbind),
-#                            ex  = {
-#                              out <- optim(par       = w[ ,k],
-#                                           fn        = sum_weighted_bpr_lik,
-#                                           gr        = sum_weighted_bpr_grad,
-#                                           method    = opt_method,
-#                                           control   = list(maxit = opt_itnmax),
-#                                           x         = x,
-#                                           des_mat   = des_mat,
-#                                           post_prob = post_prob[ ,k],
-#                                           is_NLL    = TRUE)$par
-#                            })
+#     ## --------------------------------------------------------------------
+#     for (k in 1:K){
+#       # Which regions are assigned to cluster k
+#       C_k_idx <- which(C_n[, k] == 1)
+#
+#       # Concatenate data from all regions in cluster k
+#       H <- do.call(rbind, ext_des_mat[C_k_idx])
+#
+#       # Concatenate y from all regions in cluster k
+#       y <- do.call(c, data_y[C_k_idx])
+#
+#       # Add all successes and failures from all regions in cluster k
+#       N1_N0 <- colSums(suc_fail_mat[C_k_idx, ])
+#
+#       # Compute posterior variance of w
+#       V <- solve(prec_0 + crossprod(H, H))
+#
+#       # Update Mean of z
+#       mu_z <- H %*% w[, k]
+#       # Draw latent variable z from its full conditional: z | \w, y, X
+#       z <- rep(NA_real_, sum(N1_N0))
+#       z[y == 1] <- rtruncnorm(N1_N0[1], mean = mu_z[y == 1], sd = 1,
+#                               a = 0, b = Inf)
+#       z[y == 0] <- rtruncnorm(N1_N0[2], mean = mu_z[y == 0], sd = 1,
+#                               a = -Inf, b = 0)
+#
+#       # Compute posterior mean of w
+#       Mu <- V %*% (w_0_prec_0 + crossprod(H, z))
+#       # Draw variable \w from its full conditional: \w | z, X
+#       w[, k] <- c(rmvnorm(1, Mu, V))
+#
+#       # Store the w draws
+#       w_draws[t, , k] <- w[, k]
 #     }
+
+
+
+    # Update basis function coefficient vector w for each cluster
+    # If parallel mode is ON
+    if (is_parallel){
+      # Parallel optimization for each cluster k
+      w <- foreach::"%dopar%"(obj = foreach::foreach(k = 1:K,
+                                                     .combine = cbind),
+                  ex  = {
+                    out <- gibbs_iter_fdmm(w            = w[ ,k],
+                                           C_n          = C_n[, k],
+                                           ext_des_mat  = ext_des_mat,
+                                           data_y       = data_y,
+                                           suc_fail_mat = suc_fail_mat,
+                                           prec_0       = prec_0,
+                                           w_0_prec_0   = w_0_prec_0)
+                  })
+    }else{
+      # Sequential optimization for each clustrer k
+      w <- foreach::"%do%"(obj = foreach::foreach(k = 1:K,
+                                                  .combine = cbind),
+                 ex  = {
+                   out <- gibbs_iter_fdmm(w            = w[ ,k],
+                                          C_n          = C_n[, k],
+                                          ext_des_mat  = ext_des_mat,
+                                          data_y       = data_y,
+                                          suc_fail_mat = suc_fail_mat,
+                                          prec_0       = prec_0,
+                                          w_0_prec_0   = w_0_prec_0)
+                 })
+    }
+    # Store the w draws
+    w_draws[t, , ] <- w
   }
 
   if (is_parallel){
@@ -260,8 +257,41 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
                         basis = basis,
                         C_matrix = C_matrix,
                         w_draws = w_draws,
-                        pi_draws = pi_draws,
-                        post_prob = post_prob),
+                        pi_draws = pi_draws),
                    class = "bpr_fdmm")
   return(obj)
+}
+
+
+gibbs_iter_fdmm <- function(w, C_n, ext_des_mat, data_y, suc_fail_mat, prec_0,
+                            w_0_prec_0){
+  # Which regions are assigned to cluster k
+  C_k_idx <- which(C_n == 1)
+
+  # Concatenate data from all regions in cluster k
+  H <- do.call(rbind, ext_des_mat[C_k_idx])
+
+  # Concatenate y from all regions in cluster k
+  y <- do.call(c, data_y[C_k_idx])
+
+  # Add all successes and failures from all regions in cluster k
+  N1_N0 <- colSums(suc_fail_mat[C_k_idx, ])
+
+  # Compute posterior variance of w
+  V <- solve(prec_0 + crossprod(H, H))
+
+  # Update Mean of z
+  mu_z <- H %*% w
+  # Draw latent variable z from its full conditional: z | \w, y, X
+  z <- rep(NA_real_, sum(N1_N0))
+  z[y == 1] <- rtruncnorm(N1_N0[1], mean = mu_z[y == 1], sd = 1,
+                          a = 0, b = Inf)
+  z[y == 0] <- rtruncnorm(N1_N0[2], mean = mu_z[y == 0], sd = 1,
+                          a = -Inf, b = 0)
+
+  # Compute posterior mean of w
+  Mu <- V %*% (w_0_prec_0 + crossprod(H, z))
+  # Draw variable \w from its full conditional: \w | z, X
+  w <- c(rmvnorm(1, Mu, V))
+  return(w)
 }
