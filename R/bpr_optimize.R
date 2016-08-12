@@ -63,7 +63,7 @@ bpr_optim.default <- function(x, ...){
 #' @examples
 #' ex_data <- bpr_data
 #' basis <- rbf.object(M=3)
-#' out_opt <- bpr_optim(x = ex_data, is_parallel = FALSE, basis = basis, opt_method = "CG")
+#' out_opt <- bpr_optim(x = ex_data, is_parallel = TRUE, basis = basis, opt_method = "CG")
 #'
 #' @export
 bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
@@ -115,6 +115,7 @@ bpr_optim.list <- function(x, w = NULL, basis = NULL, fit_feature = NULL,
                               })
     # Stop parallel execution
     parallel::stopCluster(cl)
+    doParallel::stopImplicitCluster()
   }else{
     # Sequential optimization for each element of x, i.e. for each region i.
     res <- foreach::"%do%"(obj = foreach::foreach(i = 1:N),

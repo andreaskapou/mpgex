@@ -43,8 +43,8 @@
 #' obs <- bpr_data
 #' y   <- gex_data
 #' basis <- rbf.object(M = 5)
-#' out   <- mpgex_regr(x = obs, y = y, basis = basis, is_parallel = FALSE,
-#'                     opt_itnmax = 50)
+#' out   <- mpgex_regr(x = obs, y = y, basis = basis, is_parallel = FALSE, fit_feature = "RMSE", cpg_dens_feat = TRUE,
+#'                     opt_itnmax = 10)
 #'
 #' @export
 mpgex_regr <- function(formula = NULL, x, y, model_name = "svm", w = NULL,
