@@ -94,13 +94,13 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
     # Create design matrix for each observation
     des_mat <- parallel::mclapply(X   = x,
                                   FUN = function(y)
-                                    design_matrix(x = basis, obs = y[ ,1])$H,
+                                    .design_matrix(x = basis, obs = y[ ,1])$H,
                                   mc.cores = no_cores)
   }else{
     # Create design matrix for each observation
     des_mat <- lapply(X   = x,
                       FUN = function(y)
-                        design_matrix(x = basis, obs = y[ ,1])$H)
+                        .design_matrix(x = basis, obs = y[ ,1])$H)
   }
 
   ## ----------------------------------------------------------------------
@@ -144,17 +144,17 @@ bpr_fdmm <- function(x, K = 2, pi_k = NULL, w = NULL, basis = NULL,
       # For each element in x, evaluate the BPR log likelihood
       weighted_pdf[ ,k] <- vapply(X   = 1:N,
                                   FUN = function(y)
-                                    bpr_likelihood(w = w[, k],
-                                                   H = des_mat[[y]],
-                                                   data = x[[y]][ ,2:3],
-                                                   is_NLL = FALSE),
+                                      .bpr_likelihood(w = w[, k],
+                                                      H = des_mat[[y]],
+                                                      data = x[[y]][ ,2:3],
+                                                      is_NLL = FALSE),
                                   FUN.VALUE = numeric(1),
                                   USE.NAMES = FALSE)
       weighted_pdf[ ,k] <- log(pi_k[k]) + weighted_pdf[, k]
     }
 
     # Calculate probabilities using the logSumExp trick for numerical stability
-    Z <- apply(weighted_pdf, 1, log_sum_exp)
+    Z <- apply(weighted_pdf, 1, .log_sum_exp)
     # Get actual posterior probabilities, i.e. responsibilities
     post_prob <- exp(weighted_pdf - Z)
     # Evaluate and store the NLL
